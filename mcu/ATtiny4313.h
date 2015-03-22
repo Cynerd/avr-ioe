@@ -3,9 +3,14 @@
  */
 #include <avr/io.h>
 
-#define USI_DIR_REG     DDRB
-#define USI_OUT_REG     PORTB
-#define USI_IN_REG      PINB
-#define USI_USCK_PIN    PORTB7
-#define USI_DO_PIN      PORTB6
-#define USI_DI_PIN      PORTB5
+// SPI USI
+#define DDR_USI     DDRB
+#define DD_DI       DDB5
+#define DD_DO       DDB6
+#define DD_USCK     DDB7
+#define PORT_USI    PORTB
+#define PORT_DI     PORTB5
+#define PORT_DO     PORTB6
+#define PORT_USCK   PORTB7
+
+// SPI USART

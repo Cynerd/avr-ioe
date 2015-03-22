@@ -3,8 +3,14 @@
  */
 #include <avr/io.h>
 
-#define DDR_SPI DDRB
-#define DD_SS   DDB0
-#define DD_MOSI DDB2
-#define DD_MISO DDB3
-#define DD_SCLK  DDB5
+// SPI
+#define DDR_SPI     DDRB
+#define DD_SS       DDB0
+#define DD_SCLK     DDB1
+#define DD_MOSI     DDB2
+#define DD_MISO     DDB3
+#define PORT_SPI    PORTB
+#define PORT_SS     PORTB0
+#define PORT_SCLK   PORTB1
+#define PORT_MOSI   PORTB2
+#define PORT_MISO   PORTB3
