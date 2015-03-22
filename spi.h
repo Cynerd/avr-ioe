@@ -1,13 +1,11 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-#include "mcu/mcu.h"
-
 #ifndef _IOE_SPI_H_
 #define _IOE_SPI_H_
 
 inline void ioe_spi_init(void);
-inline int ioe_spi_ready(void);
+inline int ioe_spi_bussy(void);
 inline void ioe_spi_join(void);
 #ifdef IOE_SPI_MASTER
 inline int8_t ioe_spi_transfer(int8_t data);

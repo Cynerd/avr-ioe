@@ -13,3 +13,4 @@ help:
 clean:
 	$(RM) $(IOE_SPI_OBJ)
 	$(RM) $(IOE_SPI_USI_OBJ)
+	$(RM) $(IOE_SPI_USART_OBJ)

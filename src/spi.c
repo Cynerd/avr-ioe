@@ -1,23 +1,23 @@
-#include "../../spi.h"
-
-#if __AVR_ARCH__ == 5
+#include "../spi.h"
+#include "mcu/mcu.h"
 
 inline void ioe_spi_join(void) {
     // TODO
 }
 
+inline int ioe_spi_bussy(void) {
+}
+
 #ifdef IOE_SPI_MASTER
 inline void ioe_spi_init(void) {
-    // Set MOSI and SCK output, all other input
-    DDR_SPI = _BV(DD_MOSI) | _BV(DD_SCLK);
-    // Enable interrupt
+    // Set MOSI and SCK output
+    DDR_SPI |= _BV(DD_MOSI) | _BV(DD_SCLK);
+    // Set MISO pull up resistor
+    PORT_SPI |= _BV(PORT_MISO);
+    // Enable SPI interrupt
     SPCR |= _BV(SPIE);
     // Enable SPI master and set clock rate fck/16
     SPCR = _BV(SPE) | _BV(MSTR) | _BV(SPR0);
-}
-
-inline int ioe_spi_ready(void) {
-    // TODO
 }
 
 inline void ioe_spi_transfer(int8_t data) {
@@ -26,10 +26,12 @@ inline void ioe_spi_transfer(int8_t data) {
 
 #else /* IOE_SPI_MASTER */
 inline void ioe_spi_init(void) {
-    // Set MISO as output, all other input
+    // Set MISO as output
     DDR_SPI = _BV(DD_MISO);
-    // Enable interrupt
-    SPCR |= _BV(SPIE);          
+    // Set SCLK and MOSI pull up resistor
+    PORT_SPI |= _BV(PORT_SCLK) | _BV(PORT_MOSI);
+    // Enable SPI interrupt
+    SPCR |= _BV(SPIE);
     // Enable SPI
     SPCR = _BV(SPE);
 }
@@ -43,5 +45,3 @@ inline void ioe_spi_expose(int8_t data) {
 SIGNAL(SPI_STC_vect) {
     ioe_spi_retrieve(SPDR);
 }
-
-#endif /* __AVR_ARCH__ == 5 */

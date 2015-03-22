@@ -1,13 +1,14 @@
-#include "../../spi_usi.h"
-
-#if __AVR_ARCH__ == 25
+#include "../spi_usi.h"
+#include "../mcu/mcu.h"
 
 #ifdef IOE_SPI_USI_MASTER
 
 // TODO counter settings with interups
 inline void ioe_spi_usi_init(void) {
-    USI_DIR_REG |= _BV(USI_USCK_PIN) | _BV(USI_DO_PIN);
-    USI_OUT_REG |= _BV(USI_DI_PIN);
+    // Set USCK and DO as output
+    DDR_USI |= _BV(DD_USCK) | _BV(DD_DO);
+    // Set DI pull up resistor
+    PORT_USI |= _BV(PORT_DI);
 
     USICR |= _BV(USIWM0) | _BV(USICS1) | _BV(USICLK);
 }
@@ -24,8 +25,10 @@ inline int8_t ioe_spi_usi_transfer(int8_t d) {
 #else /* IOE_SPI_USI_MASTER */
 
 inline void ioe_spi_usi_init(void) {
-    USI_DIR_REG |= _BV(USI_DO_PIN);
-    USI_OUT_REG |= _BV(USI_USCK_PIN) | _BV(USI_DI_PIN);
+    // Set DO as output
+    DDR_USI |= _BV(DD_DO);
+    // Set USCK and DI pull up resistor
+    PORT_USI |= _BV(PORT_USCK) | _BV(PORT_DI);
 
     USICR |= _BV(USIWM0) | _BV(USICS1) | _BV(USIOIE);
 }
@@ -34,11 +37,7 @@ inline void ioe_spi_usi_expose(int8_t data) {
     USIDR = data;
 }
 
-inline void ioe_spi_usi_expect(void) {
-    USISR |= _BV(USIOIF);
-}
-
-inline int ioe_spi_usi_busy(void) {
+inline uint8_t ioe_spi_usi_busy(void) {
     return USISR & 0x0F;
 }
 
@@ -49,8 +48,7 @@ inline void ioe_spi_usi_join(void) {
 
 SIGNAL(USI_OVF_vect) {
     ioe_spi_usi_retrieve(USIDR);
+    USISR |= _BV(USIOIF);
 }
 
 #endif /* IOE_SPI_USI_MASTER */
-
-#endif /* __AVR_ARCH__ == 25 */
