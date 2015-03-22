@@ -1,0 +1,27 @@
+comb port {
+    char "Class" "Port class"
+    int "Port" "Port number"
+} "$1$2" "Specifies port. Combination of class and port. Now set: $1$2"
+
+enum nrf_spi {
+    spi, usi, usart
+}
+
+menu "nrf24l01p" "Driver for nRF24L01+"
+
+NRF_SPII: (spi SPI_MASTER) || (usi SPI_USI_MASTER)
+    type nrf_spi
+    default spi
+    menu "SPI interface" "Specify SPI interface"
+
+NRF_CSN_PORT:
+    type port
+    nodefault
+    menu "SPI CSN Port" "SPI Chip select port"
+
+NRF_CE_PORT:
+    type port
+    nodefault
+    menu "CE port" "Chip enable port"
+
+endmenu
