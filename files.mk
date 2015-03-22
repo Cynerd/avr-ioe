@@ -2,6 +2,7 @@ ifndef IOE_PREFIX
 	IOE_PREFIX = .
 endif
 
+include charLCD/files.mk
 include dht22/files.mk
 IOE_SPI_SRC = $(IOE_PREFIX)/src/spi.c
 IOE_SPI_USI_SRC = $(IOE_PREFIX)/src/spi_usi.c
