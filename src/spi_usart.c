@@ -1,5 +1,5 @@
 #include "../spi_usart.h"
-#include "mcu/mcu.h"
+#include "../mcu/mcu_def.h"
 
 inline void ioe_spi_usart_init(void) {
 }

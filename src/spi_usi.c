@@ -1,5 +1,5 @@
 #include "../spi_usi.h"
-#include "../mcu/mcu.h"
+#include "../mcu/mcu_def.h"
 
 #ifdef IOE_SPI_USI_MASTER
 

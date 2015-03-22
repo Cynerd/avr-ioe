@@ -1,5 +1,5 @@
 #include "../spi.h"
-#include "mcu/mcu.h"
+#include "mcu/mcu_def.h"
 
 inline void ioe_spi_join(void) {
     // TODO
