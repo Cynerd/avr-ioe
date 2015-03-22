@@ -16,4 +16,8 @@ inline void ioe_spi_expose(int8_t data);
 // Following function must be user defined
 inline void ioe_spi_retrieve(int8_t);
 
+#if !(__MCU_ATmega328p__ || __MCU_ATmega32U4p__)
+#error "SPI is not probably supported by your hardware."
+#endif
+
 #endif /* _IOE_SPI_H_ */
