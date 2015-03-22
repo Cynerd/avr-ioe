@@ -3,6 +3,8 @@
 #include <avr/interrupt.h>
 #include <inttypes.h>
 
+#include "mcu/mcu.h"
+
 #ifndef _IOE_SPI_USI_H_
 #define _IOE_SPI_USI_H_
 
@@ -35,14 +37,17 @@ inline uint8_t ioe_spi_usi_busy(void);
  */
 inline void ioe_spi_usi_join(void);
 
-// Following function must be user defined
 /*
  * This function must be defined by user.
  * This function is called every time transfer is finished.
  * And until return from this function interrupts are disabled.
+ * WARNING: Please define this function in your code.
  */
 inline void ioe_spi_usi_retrieve(int8_t data);
 #endif /* IOE_SPI_USI_MASTER */
 
+#if !(__MCU_ATtiny4313__ || __MCU_ATtiny85__)
+#error "USI is not probably supported by your MCU."
+#endif
 
 #endif /* _IOE_SPI_USI_H_ */
