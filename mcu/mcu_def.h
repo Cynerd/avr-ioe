@@ -8,6 +8,10 @@
 #include "ATmega32U4.h"
 #endif
 
+#if __MCU_ATmega8A__
+#include "ATmega8A.h"
+#endif
+
 #if __MCU_ATtiny4313__
 #include "ATtiny4313.h"
 #endif
