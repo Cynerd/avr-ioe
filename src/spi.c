@@ -6,6 +6,7 @@ inline void ioe_spi_join(void) {
 }
 
 inline int ioe_spi_bussy(void) {
+    // TODO
 }
 
 #ifdef IOE_SPI_MASTER
