@@ -4,6 +4,7 @@
 #include <avr/io.h>
 
 // SPI USI
+#define MCUSUPPORT_USI
 #define DDR_USI     DDRB
 #define DD_DI       DDB0
 #define DD_DO       DDB1

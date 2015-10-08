@@ -4,6 +4,7 @@
 #include <avr/io.h>
 
 // SPI
+#define MCUSUPPORT_SPI
 #define DDR_SPI     DDRB
 #define DD_SS       DDB0
 #define DD_SCLK     DDB1
@@ -14,3 +15,5 @@
 #define PORT_SCLK   PORTB1
 #define PORT_MOSI   PORTB2
 #define PORT_MISO   PORTB3
+// USART
+#define MCUSUPPORT_USART0
