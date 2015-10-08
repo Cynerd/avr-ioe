@@ -9,7 +9,6 @@ void rec(uint8_t data) {
 }
 
 int main() {
-    DDRB |= _BV(DDB1) | _BV(DDB2);
     usart_init_uart();
     SREG |= _BV(7);
     usart_send('a');

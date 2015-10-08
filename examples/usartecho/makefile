@@ -3,15 +3,12 @@ MAKEFLAGS += --no-builtin-rules
 MMCU = atmega328p
 F_CPU = 16000000L
 IOE_PREFIX = ../..
-IOE_CFLAGS = -Os -ffunction-sections -fdata-sections -fshort-enums -Wall -g \
+IOE_CFLAGS = -Os -ffunction-sections -fdata-sections -fshort-enums -Wall \
 			 -DCONFIG_IOE_USART_OUTBUFFER_SIZE=64 \
 			 -DCONFIG_IOE_USART_OUTBUFFER_MODE=0
 
 all: usart.hex
 	@echo Flash usart.hex to chip
-
-install: usart.hex
-	# TODO
 
 clean: ioeclean
 	$(RM) echo.o
