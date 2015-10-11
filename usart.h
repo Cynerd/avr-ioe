@@ -49,7 +49,7 @@ uint8_t usart_inbuffered(void);
 uint8_t usart_outbuffered(void);
 #endif
 #if (defined CONFIG_IOE_USART_INFILE) || (defined CONFIG_IOE_USART_OUTFILE)
-FILE *spi_open(void);
+FILE *usart_async_open(void);
 #endif
 
 // Following function must be user defined if relevant buffers not used.

@@ -29,8 +29,8 @@ endif
 ifndef MMCU
 	$(error Pleade define MMCU variable in makefile before including avr-ioe.mk)
 endif
-IOE_CFLAGS ?= -Os -ffunction-sections -fdata-sections -fshort-enums -Wall
-IOE_CFLAGS += -DF_CPU=$(F_CPU) -mmcu=$(MMCU)
+IOE_CFLAGS ?= -Os -ffunction-sections -fdata-sections -fshort-enums -Wall \
+			  -DF_CPU=$(F_CPU) -mmcu=$(MMCU)
 IOE_GCC ?= avr-gcc
 
 $(IOE_OBJ): %.o: %.c
@@ -40,7 +40,7 @@ $(IOE_DEP): %.d: %.c
 	$(IOE_GCC) -MM -MG -MT '$*.o $@' $(IOE_CFLAGS) -c -o $@ $<
 
 .PHONY: ioeclean
-ioeclean:
+ioeclean::
 	$(RM) $(IOE_OBJ)
 	$(RM) $(IOE_DEP)
 

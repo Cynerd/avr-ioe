@@ -185,12 +185,12 @@ FILE *usart_async_open(void) {
     usart_init_async();
 #ifdef CONFIG_IOE_USART_OUTFILE
 #ifdef CONFIG_IOE_USART_INFILE
-    return fdevopen(spiput, spiget);
+    return fdevopen(usartput, usartget);
 #else
-    return fdevopen(spiput, 0);
+    return fdevopen(usartput, 0);
 #endif
 #else
-    return fdevopen(0, spiget);
+    return fdevopen(0, usartget);
 #endif
 }
 #endif

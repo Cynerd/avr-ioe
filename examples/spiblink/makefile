@@ -3,7 +3,8 @@ MAKEFLAGS += --no-builtin-rules
 MMCU = atmega328p
 F_CPU = 16000000L
 IOE_PREFIX = ../..
-IOE_CFLAGS ?= -Os -ffunction-sections -fdata-sections -fshort-enums -g -Wall
+IOE_CFLAGS ?= -Os -ffunction-sections -fdata-sections -fshort-enums -g -Wall \
+			  -DF_CPU=$(F_CPU) -mmcu=$(MMCU)
 
 .PHONY: all
 all:  master.hex slave.hex
