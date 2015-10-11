@@ -96,8 +96,9 @@ inline void usart_send(uint8_t data) {
         _usart_busy = 1;
         UDR0 = data;
     } else {
-        IOEBUFFER_PUT(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE,
-                data, CONFIG_IOE_USART_OUTBUFFER_MODE);
+        IOEBUFFER_PUT(_ioe_usart_outbuffer,
+                      CONFIG_IOE_USART_OUTBUFFER_SIZE, data,
+                      CONFIG_IOE_USART_OUTBUFFER_MODE);
     }
 #else
     _usart_busy = 1;
@@ -107,8 +108,8 @@ inline void usart_send(uint8_t data) {
 
 #ifdef _IOE_USART_OUTBUFFER
 void usart_send_str(char *str) {
-    while(*str != '\0') {
-        usart_send((uint8_t) *str);
+    while (*str != '\0') {
+        usart_send((uint8_t) * str);
         str++;
     }
 }
@@ -117,7 +118,8 @@ void usart_send_str(char *str) {
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_get(void) {
     uint8_t rtn = 0;
-    IOEBUFFER_GET(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE, rtn);
+    IOEBUFFER_GET(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE,
+                  rtn);
     return rtn;
 }
 #endif
@@ -133,7 +135,8 @@ inline int8_t usart_busy(void) {
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_inbuffered(void) {
     uint8_t rtn;
-    IOEBUFFER_CNT(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE, rtn);
+    IOEBUFFER_CNT(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE,
+                  rtn);
     return rtn;
 }
 #endif
@@ -141,7 +144,8 @@ uint8_t usart_inbuffered(void) {
 #ifdef _IOE_USART_OUTBUFFER
 uint8_t usart_outbuffered(void) {
     uint8_t rtn;
-    IOEBUFFER_CNT(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE, rtn);
+    IOEBUFFER_CNT(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE,
+                  rtn);
     return rtn;
 }
 #endif
@@ -152,8 +156,9 @@ void (*usart_sent) (void) = 0;
 
 SIGNAL(USART_RX_vect) {
 #ifdef _IOE_USART_INBUFFER
+    uint8_t val = UDR0;
     IOEBUFFER_PUT(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE,
-            UDR0, CONFIG_IOE_USART_INBUFFER_MODE);
+                  val, CONFIG_IOE_USART_INBUFFER_MODE);
 #endif /* _IOE_USART_INBUFFER */
     if (usart_receive)
         usart_receive(UDR0);
@@ -162,7 +167,8 @@ SIGNAL(USART_RX_vect) {
 SIGNAL(USART_UDRE_vect) {
 #ifdef _IOE_USART_OUTBUFFER
     uint8_t val;
-    IOEBUFFER_GET(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE, val);
+    IOEBUFFER_GET(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE,
+                  val);
     if (val)
         UDR0 = val;
     else
