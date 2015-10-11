@@ -2,83 +2,98 @@
 
 #ifdef MCUSUPPORT_USART
 
+#define USART_PARITY_NONE 0
+#define USART_PARITY_ODD 1
+#define USART_PARITY_EVEN 2
+
+#define USART_STOPBIT_SINGLE 1
+#define USART_STOPBIT_DOUBLE 2
+
+#ifndef CONFIG_IOE_USART_BAUD
+#warning "CONFIG_IOE_USART_BAUNDRATE not defined. Setting default 9600."
+#define CONFIG_IOE_USART_BAUD 9600
+#endif
+#ifndef CONFIG_IOE_USART_PARITY
+#warning "CONFIG_IOE_USART_PARITY not defined. Using default USART_PARITY_NONE."
+#define CONFIG_IOE_USART_PARITY USART_PARITY_NONE
+#endif
+#ifndef CONFIG_IOE_USART_STOPBIT
+#warning "CONFIG_IOE_USART_STOPBIT not defined. Using default USART_STOPBIT_SINGLE."
+#define CONFIG_IOE_USART_STOPBIT USART_STOPBIT_SINGLE
+#endif
+#ifndef CONFIG_IOE_USART_DATABITS
+#warning "CONFIG_IOE_USART_DATABITS not defined. Using default 8."
+#define CONFIG_IOE_USART_DATABITS 8
+#endif
+
+#if !((CONFIG_IOE_USART_PARITY == USART_PARITY_NONE) || \
+      (CONFIG_IOE_USART_PARITY == USART_PARITY_ODD) || \
+      (CONFIG_IOE_USART_PARITY == USART_PARITY_EVEN))
+#error "CONFIG_IOE_USART_PARITY has value, that is not allowed."
+#endif
+
+#if !((CONFIG_IOE_USART_STOPBIT == USART_STOPBIT_SINGLE) || \
+      (CONFIG_IOE_USART_STOPBIT == USART_STOPBIT_DOUBLE))
+#error "CONFIG_IOE_USART_STOPBIT has value, that is not allowed."
+#endif
+
+#if !((CONFIG_IOE_USART_DATABITS == 5) || \
+      (CONFIG_IOE_USART_DATABITS == 6) || \
+      (CONFIG_IOE_USART_DATABITS == 7) || \
+      (CONFIG_IOE_USART_DATABITS == 8))
+// TODO DATABITS 9 is not supported
+#error "CONFIG_IOE_USART_DATABITS has value, that is not allowed."
+#endif
+
+#if (defined CONFIG_IOE_USART_INFILE) && (CONFIG_IOE_USART_INBUFFER_SIZE <= 0)
+#error "USART Input file can't be enabled without input buffer"
+#endif
+#if (defined CONFIG_IOE_USART_OUTFILE) && (CONFIG_IOE_USART_OUTBUFFER_SIZE <= 0)
+#error "USART Input file can't be enabled without output buffer"
+#endif
+
+
 volatile int8_t _usart_busy;
 
-inline void usart_init_uart(void) {
-    usart_init_async(USART_BAUDRATE_115200, USART_PARITY_NONE,
-                     USART_STOPBIT_SINGLE, USART_DATABITS_8);
-}
-
-void usart_init_async(enum usartBaudrate baudrate,
-                      enum usartParity parity, enum usartStopBit stopbit,
-                      enum usartDataBits databits) {
+void usart_init_async(void) {
     _usart_busy = 0;
-    switch (baudrate) {
-    case USART_BAUDRATE_2400:
-#define BAUD 2400
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_4800:
-#define BAUD 4800
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_9600:
-#define BAUD 9600
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_19200:
-#define BAUD 19200
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_38400:
-#define BAUD 38400
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_57600:
-#define BAUD 57600
-#include "usart_baundrate_helper.h"
-        break;
-    case USART_BAUDRATE_115200:
-#define BAUD 115200
-#include "usart_baundrate_helper.h"
-        break;
-    }
-    switch (parity) {
-    case USART_PARITY_NONE:
-        UCSR0C &= ~(_BV(UPM00) | _BV(UPM01));
-        break;
-    case USART_PARITY_ODD:
-        UCSR0C &= ~_BV(UPM00);
-        UCSR0C |= _BV(UPM01);
-        break;
-    case USART_PARITY_EVEN:
-        UCSR0C |= _BV(UPM00) | _BV(UPM01);
-        break;
-    }
-    switch (stopbit) {
-    case USART_STOPBIT_SINGLE:
-        UCSR0C &= ~_BV(USBS0);
-        break;
-    case USART_STOPBIT_DOUBLE:
-        UCSR0C |= _BV(USBS0);
-        break;
-    }
-    switch (databits) {
-    case USART_DATABITS_5:
-        UCSR0C &= ~(_BV(UCSZ00) | _BV(UCSZ01));
-        break;
-    case USART_DATABITS_6:
-        UCSR0C &= ~_BV(UCSZ01);
-        UCSR0C |= _BV(UCSZ00);
-        break;
-    case USART_DATABITS_7:
-        UCSR0C &= ~_BV(UCSZ00);
-        UCSR0C |= _BV(UCSZ01);
-        break;
-    case USART_DATABITS_8:
-        UCSR0C |= _BV(UCSZ00) | _BV(UCSZ01);
-        break;
-    }
+#define BAUD CONFIG_IOE_USART_BAUD
+#include <util/setbaud.h>
+    UBRR0H = UBRRH_VALUE;
+    UBRR0L = UBRRL_VALUE;
+#if USE_2X
+    UCSR0A |= _BV(U2X0);
+#else
+    UCSR0A &= ~_BV(U2X0);
+#endif
+
+#if CONFIG_IOE_USART_PARITY == USART_PARITY_NONE
+    UCSR0C &= ~(_BV(UPM00) | _BV(UPM01));
+#elif CONFIG_IOE_USART_PARITY == USART_PARITY_ODD
+    UCSR0C &= ~_BV(UPM00);
+    UCSR0C |= _BV(UPM01);
+#else // USART_PARITY_EVEN
+    UCSR0C |= _BV(UPM00) | _BV(UPM01);
+#endif
+
+#if CONFIG_IOE_USART_STOPBIT == USART_STOPBIT_SINGLE
+    UCSR0C &= ~_BV(USBS0);
+#else
+    UCSR0C |= _BV(USBS0);
+#endif
+
+#if CONFIG_IOE_USART_DATABITS == 5
+    UCSR0C &= ~(_BV(UCSZ00) | _BV(UCSZ01));
+#elif CONFIG_IOE_USART_DATABITS == 6
+    UCSR0C &= ~_BV(UCSZ01);
+    UCSR0C |= _BV(UCSZ00);
+#elif CONFIG_IOE_USART_DATABITS == 7
+    UCSR0C &= ~_BV(UCSZ00);
+    UCSR0C |= _BV(UCSZ01);
+#elif CONFIG_IOE_USART_DATABITS == 8
+    UCSR0C |= _BV(UCSZ00) | _BV(UCSZ01);
+#endif
+
     // Enable receiver, transmitter and RX complete,
     // Data register empty interrupts
     UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0) | _BV(UDRIE0);

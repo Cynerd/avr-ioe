@@ -13,51 +13,11 @@
 #error "No USART interface is known on your mcu."
 #endif
 
-enum usartBaudrate {
-    USART_BAUDRATE_2400,
-    USART_BAUDRATE_4800,
-    USART_BAUDRATE_9600,
-    USART_BAUDRATE_19200,
-    USART_BAUDRATE_38400,
-    USART_BAUDRATE_57600,
-    USART_BAUDRATE_115200
-};
-
-enum usartParity {
-    USART_PARITY_NONE,
-    USART_PARITY_ODD,
-    USART_PARITY_EVEN
-};
-
-enum usartStopBit {
-    USART_STOPBIT_SINGLE = 1,
-    USART_STOPBIT_DOUBLE = 2
-};
-
-enum usartDataBits {
-    USART_DATABITS_5 = 5,
-    USART_DATABITS_6 = 6,
-    USART_DATABITS_7 = 7,
-    USART_DATABITS_8 = 8,
-    // USART_DATABITS_9 = 9 // Not supported yet
-};
-
-// Not supported yet. This is for synchronous mode only
-//enum usartClockPolarity {
-    //USART_CLOCKPOLARITY_FALLING,
-    //USART_CLOCKPOLARITY_RISING
-//};
+// TODO clock polarity and synchronous mode
 
 #define USART_FRAMEERROR  _BV(FE0)
 #define USART_DATAOVERRUN _BV(DOR0)
 #define USART_PARITYERROR _BV(UPE0)
-
-#if (defined CONFIG_IOE_USART_INFILE) && (CONFIG_IOE_USART_INBUFFER_SIZE <= 0)
-#error "USART Input file can't be enabled without input buffer"
-#endif
-#if (defined CONFIG_IOE_USART_OUTFILE) && (CONFIG_IOE_USART_OUTBUFFER_SIZE <= 0)
-#error "USART Input file can't be enabled without output buffer"
-#endif
 
 #if CONFIG_IOE_USART_INBUFFER_SIZE > 0
 #define _IOE_USART_INBUFFER
@@ -70,14 +30,9 @@ volatile IOEBUFFER(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE);
 
 
 /*
- * Initialize USART device with 115200 baud rate, no parity, single stop bit,
- * and 8 data bits.
- * This function serves as fast default initialization.
+ * Initialize USART device.
  */
-void usart_init_uart(void);
-void usart_init_async(enum usartBaudrate,
-                      enum usartParity, enum usartStopBit,
-                      enum usartDataBits);
+void usart_init_async(void);
 void usart_send(uint8_t data);
 #ifdef _IOE_USART_OUTBUFFER
 void usart_send_str(char *str);
