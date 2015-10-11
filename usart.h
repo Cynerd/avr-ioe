@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "mcu/mcu_def.h"
 #include "buffers.h"
@@ -51,6 +52,13 @@ enum usartDataBits {
 #define USART_DATAOVERRUN _BV(DOR0)
 #define USART_PARITYERROR _BV(UPE0)
 
+#if (defined CONFIG_IOE_USART_INFILE) && (CONFIG_IOE_USART_INBUFFER_SIZE <= 0)
+#error "USART Input file can't be enabled without input buffer"
+#endif
+#if (defined CONFIG_IOE_USART_OUTFILE) && (CONFIG_IOE_USART_OUTBUFFER_SIZE <= 0)
+#error "USART Input file can't be enabled without output buffer"
+#endif
+
 #if CONFIG_IOE_USART_INBUFFER_SIZE > 0
 #define _IOE_USART_INBUFFER
 volatile IOEBUFFER(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE);
@@ -84,6 +92,9 @@ uint8_t usart_inbuffered(void);
 #endif
 #ifdef _IOE_USART_OUTBUFFER
 uint8_t usart_outbuffered(void);
+#endif
+#if (defined CONFIG_IOE_USART_INFILE) || (defined CONFIG_IOE_USART_OUTFILE)
+FILE *spi_open(void);
 #endif
 
 // Following function must be user defined if relevant buffers not used.

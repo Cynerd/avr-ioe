@@ -117,7 +117,7 @@ void usart_send_str(char *str) {
 
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_get(void) {
-    uint8_t rtn = 0;
+    uint8_t rtn;
     IOEBUFFER_GET(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE,
                   rtn);
     return rtn;
@@ -147,6 +147,36 @@ uint8_t usart_outbuffered(void) {
     IOEBUFFER_CNT(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE,
                   rtn);
     return rtn;
+}
+#endif
+
+#ifdef CONFIG_IOE_USART_OUTFILE
+static int usartput(char c, FILE * f) {
+    usart_send((uint8_t) c);
+    return 0;
+}
+#endif
+
+#ifdef CONFIG_IOE_USART_INBUFFER
+static int usartget(FILE * f) {
+    uint8_t v;
+    while (!(v = usart_get()));
+    return v;
+}
+#endif
+
+#if (defined CONFIG_IOE_USART_INFILE) || (defined CONFIG_IOE_USART_OUTFILE)
+FILE *usart_async_open(void) {
+    usart_init_async();
+#ifdef CONFIG_IOE_USART_OUTFILE
+#ifdef CONFIG_IOE_USART_INFILE
+    return fdevopen(spiput, spiget);
+#else
+    return fdevopen(spiput, 0);
+#endif
+#else
+    return fdevopen(0, spiget);
+#endif
 }
 #endif
 
