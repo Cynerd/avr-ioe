@@ -4,4 +4,6 @@
 
 *.o
 *.d
+*.hex
+*.elf
 trash
