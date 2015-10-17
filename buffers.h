@@ -4,6 +4,8 @@
  * implementation is only few lines of code. This way it is included directly
  * to code.
  */
+#include "tasks.h"
+
 #ifndef _IOE_BUFFERS_H_
 #define _IOE_BUFFERS_H_
 

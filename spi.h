@@ -3,10 +3,12 @@
 #include <stdint.h>
 
 #include "mcu/mcu_def.h"
+#include "tasks.h"
 #include "buffers.h"
 
 #ifndef _IOE_SPI_H_
 #define _IOE_SPI_H_
+#ifdef CONFIG_IOE_SPI
 
 #ifndef MCUSUPPORT_SPI
 #error "No SPI interface is known on your mcu."
@@ -17,51 +19,51 @@ enum spiMode {
     SPI_MODE_SLAVE
 };
 
+volatile extern int8_t _spi_busy;
 
-/*
- * Initialize SPI
- *
- *  Parameters:
- *    mode - Specify mode of SPI interface
- *
- * NOTE: Global interrupt must be enabled for right function of SPI.
- * { SREG |= _BV(7) }
- */
-void spi_init(enum spiMode mode);
-/*
- * Returns NULL when device is not busy.
- * When device is busy return values in non-zero.
- */
-int8_t spi_busy(void);
-/*
- * Blocks processor until device is not busy.
- */
-void spi_join(void);
-/*
- * Swap bytes with slave over SPI.
- * This function blocks execution until device isn't busy (transfer completed).
- * WARNING: Invoke this only when interface is initialized in MASTER mode.
- */
-uint8_t spi_send(uint8_t data);
-/*
- * Transfer byte to slave over SPI.
- * This function isn't blocking execution until transfer is complete.
- * Always call spi_join before this function when called outside of spi_receive().
- * WARNING: Invoke this only when interface is initialized in MASTER mode.
- */
-void spi_transfer(uint8_t data);
-/*
- * Expose data for next master request.
- * Please don't use this when device is busy.
- * Best place to call this is spi_receive().
- * WARNING: Invoke this only when interface is initialized in SLAVE mode.
- */
-void spi_expose(uint8_t data);
+static inline void spi_init(enum spiMode mode) {
+    _spi_busy = 0;
+    if (mode == SPI_MODE_MASTER) {
+        // Set MOSI and SCK output
+        DDR_SPI |= _BV(DD_MOSI) | _BV(DD_SCLK);
+        // Set MISO pull up resistor
+        PORT_SPI |= _BV(PORT_MISO);
+        // Enable SPI master, set clock rate fck/16 and enable SPI interrupt
+        SPCR = _BV(SPE) | _BV(SPIE) | _BV(MSTR) | _BV(SPR0);
+    } else {
+        // Set MISO as output
+        DDR_SPI |= _BV(DD_MISO);
+        // Set SCLK and MOSI pull up resistor
+        PORT_SPI |= _BV(PORT_SCLK) | _BV(PORT_MOSI);
+        // Enable SPI and interrupt
+        SPCR = _BV(SPE) | _BV(SPIE);
+    }
+}
 
-/*
- * This function is called every time transfer is finished.
- * And until return from this function interrupts are disabled.
- */
+static inline int8_t spi_busy(void) {
+    return _spi_busy;
+}
+
+static inline void spi_join(void) {
+    taskDelayTill(_spi_busy);
+}
+
+static inline uint8_t spi_send(uint8_t data) {
+    spi_transfer(data);
+    taskDelayTill(_spi_busy);
+    return SPDR;
+}
+
+static inline void spi_transfer(uint8_t data) {
+    _spi_busy = 1;
+    SPDR = data;
+}
+
+static inline void spi_expose(uint8_t data) {
+    SPDR = data;
+}
+
 extern void (*spi_receive)(uint8_t data);
 
+#endif /* CONFIG_IOE_SPI */
 #endif /* _IOE_SPI_H_ */

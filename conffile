@@ -1,0 +1,65 @@
+MCU::
+    type string
+    default "atmega328p"
+    menu "MCU name"
+
+F_CPU::
+    type int
+    default 16000000
+    menu "CPU frequency"
+#################################################################################
+
+if MCU == "atmega328p"
+MCUSUPPORT_SPI:
+MCUSUPPORT_USART:
+endif
+
+#################################################################################
+
+IOE_SPI: MCUSUPPORT_USART
+    menu "SPI interface"
+
+group IOE_USART: MCUSUPPORT_SPI
+    type bool
+    menu "USART interface"
+
+IOE_USART_BAUD:
+    type int<0,>
+    menu "Baud"
+
+IOE_USART_PARITY:
+    type {!None("USART_PARITY_NONE"), Odd("USART_PARITY_ODD"), Even("USART_PARITY_EVEN")}
+    menu "Parity"
+
+IOE_USART_STOPBIT:
+    type {!Single("USART_STOPBIT_SINGLE"), Double("USART_STOPBIT_DOUBLE")}
+    menu "Number of stop bits"
+
+IOE_USART_DATABITS:
+    type int<5,8>
+    default 8
+    menu "Number of data bits"
+
+IOE_USART_INBUFFER_SIZE:
+    type int<0,>
+    menu "USART input buffer size"
+    help "Defines size of input buffer for USART interface."
+         " If size is set to 0, no buffer is used."
+
+IOE_USART_OUTBUFFER_SIZE:
+    type int<0,>
+    menu "USART output buffer size"
+    help "Defines size of output buffer for USART interface."
+         " If size is set to 0, no buffer is used."
+endgroup # IOE_USART
+
+IOE_CAN_MCP2515: IOE_SPI
+    menu "MCP2515 CAN controller"
+
+group SENSORS:
+    menu "Sensors"
+
+IOE_SENSOR_DHT22:
+    menu "DHT22 temperature and humidity sensor"
+
+endgroup # SENSORS

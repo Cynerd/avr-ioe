@@ -1,5 +1,6 @@
 #include "../usart.h"
 
+#ifdef CONFIG_IOE_USART
 #ifdef MCUSUPPORT_USART
 
 #define USART_PARITY_NONE 0
@@ -10,7 +11,7 @@
 #define USART_STOPBIT_DOUBLE 2
 
 #ifndef CONFIG_IOE_USART_BAUD
-#warning "CONFIG_IOE_USART_BAUNDRATE not defined. Setting default 9600."
+#warning "CONFIG_IOE_USART_BAUD not defined. Setting default 9600."
 #define CONFIG_IOE_USART_BAUD 9600
 #endif
 #ifndef CONFIG_IOE_USART_PARITY
@@ -67,33 +68,26 @@ void usart_init_async(void) {
     UCSR0A &= ~_BV(U2X0);
 #endif
 
-#if CONFIG_IOE_USART_PARITY == USART_PARITY_NONE
-    UCSR0C &= ~(_BV(UPM00) | _BV(UPM01));
-#elif CONFIG_IOE_USART_PARITY == USART_PARITY_ODD
-    UCSR0C &= ~_BV(UPM00);
-    UCSR0C |= _BV(UPM01);
-#else // USART_PARITY_EVEN
-    UCSR0C |= _BV(UPM00) | _BV(UPM01);
+    UCSR0C = 0 |
+// USART_PARITY_NONE are both UMP01 and UMP00 zero
+#if CONFIG_IOE_USART_PARITY == USART_PARITY_ODD
+        _BV(UPM01) |
+#elif CONFIG_IOE_USART_PARITY == USART_PARITY_EVEN
+        _BV(UPM00) | _BV(UPM01) |
 #endif
-
-#if CONFIG_IOE_USART_STOPBIT == USART_STOPBIT_SINGLE
-    UCSR0C &= ~_BV(USBS0);
-#else
-    UCSR0C |= _BV(USBS0);
+// USART_STOPBIT_SINGLE is USBS0 zero
+#if CONFIG_IOE_USART_STOPBIT == USART_STOPBIT_DOUBLE
+        _BV(USBS0) |
 #endif
-
-#if CONFIG_IOE_USART_DATABITS == 5
-    UCSR0C &= ~(_BV(UCSZ00) | _BV(UCSZ01));
-#elif CONFIG_IOE_USART_DATABITS == 6
-    UCSR0C &= ~_BV(UCSZ01);
-    UCSR0C |= _BV(UCSZ00);
+// For 5 databits are UCSZ00 and UCSZ01 zero
+#if CONFIG_IOE_USART_DATABITS == 6
+        _BV(UCSZ00)
 #elif CONFIG_IOE_USART_DATABITS == 7
-    UCSR0C &= ~_BV(UCSZ00);
-    UCSR0C |= _BV(UCSZ01);
+        _BV(UCSZ01)
 #elif CONFIG_IOE_USART_DATABITS == 8
-    UCSR0C |= _BV(UCSZ00) | _BV(UCSZ01);
+        _BV(UCSZ00) | _BV(UCSZ01)
 #endif
-
+        ;
     // Enable receiver, transmitter and RX complete,
     // Data register empty interrupts
     UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0) | _BV(UDRIE0);
@@ -122,7 +116,7 @@ inline void usart_send(uint8_t data) {
 }
 
 #ifdef _IOE_USART_OUTBUFFER
-void usart_send_str(char *str) {
+inline void usart_send_str(char *str) {
     while (*str != '\0') {
         usart_send((uint8_t) * str);
         str++;
@@ -138,14 +132,6 @@ uint8_t usart_get(void) {
     return rtn;
 }
 #endif
-
-inline uint8_t usart_queryerror(void) {
-    return UCSR0A & (_BV(FE0) | _BV(DOR0) | _BV(UPE0));
-}
-
-inline int8_t usart_busy(void) {
-    return _usart_busy;
-}
 
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_inbuffered(void) {
@@ -225,4 +211,5 @@ SIGNAL(USART_UDRE_vect) {
         usart_sent();
 }
 
-#endif
+#endif /* MCUSUPPORT_USART */
+#endif /* CONFIG_IOE_USART */

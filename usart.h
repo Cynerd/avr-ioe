@@ -4,10 +4,12 @@
 #include <stdio.h>
 
 #include "mcu/mcu_def.h"
+#include "tasks.h"
 #include "buffers.h"
 
 #ifndef _IOE_USART_H_
 #define _IOE_USART_H_
+#ifdef CONFIG_IOE_USART
 
 #ifndef MCUSUPPORT_USART
 #error "No USART interface is known on your mcu."
@@ -28,6 +30,8 @@ volatile IOEBUFFER(_ioe_usart_inbuffer, CONFIG_IOE_USART_INBUFFER_SIZE);
 volatile IOEBUFFER(_ioe_usart_outbuffer, CONFIG_IOE_USART_OUTBUFFER_SIZE);
 #endif
 
+extern volatile int8_t _usart_busy;
+
 
 /*
  * Initialize USART device.
@@ -40,8 +44,12 @@ void usart_send_str(char *str);
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_get(void);
 #endif
-uint8_t usart_queryerror(void);
-int8_t usart_busy(void);
+static inline uint8_t usart_queryerror(void) {
+    return UCSR0A & (_BV(FE0) | _BV(DOR0) | _BV(UPE0));
+}
+static inline int8_t usart_busy(void) {
+    return _usart_busy;
+}
 #ifdef _IOE_USART_INBUFFER
 uint8_t usart_inbuffered(void);
 #endif
@@ -56,4 +64,5 @@ FILE *usart_async_open(void);
 extern void (*usart_receive)(uint8_t data);
 extern void (*usart_sent)(void);
 
+#endif /* CONFIG_IOE_USART */
 #endif /* _IOE_USART_H_ */
