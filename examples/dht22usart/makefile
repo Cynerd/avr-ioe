@@ -15,7 +15,8 @@ IOE_CFLAGS = -Os -ffunction-sections -fdata-sections -fshort-enums -Wall \
 			 -DCONFIG_IOE_USART_STOPBIT=USART_STOPBIT_SINGLE \
 			 -DCONFIG_IOE_USART_DATABITS=8 \
 			 -DCONFIG_IOE_TIMERS \
-			 -DCONFIG_IOE_SENSOR_DHT22
+			 -DCONFIG_IOE_SENSOR_DHT22 \
+			 -DCONFIG_IOE_SENSOR_DHT22_TIMER=COUNTER0_PWM
 
 all: dht22.hex
 	@echo Now you can flash dht22.hex to your chip.

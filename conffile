@@ -4,8 +4,8 @@ MCU::
     menu "MCU name"
 
 F_CPU::
-    type int
-    default 16000000
+    type float
+    default 16
     menu "CPU frequency"
 #################################################################################
 

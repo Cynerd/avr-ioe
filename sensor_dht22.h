@@ -5,8 +5,8 @@
 #include "tasks.h"
 #include "timer.h"
 
-#ifndef _DHT22_H_
-#define _DHT22_H_
+#ifndef _IOE_SENSOR_DHT22_H_
+#define _IOE_SENSOR_DHT22_H_
 
 struct dht22_value {
     uint8_t integral;
@@ -36,4 +36,4 @@ void dht22_init(uint8_t port);
 int8_t dht22_read(uint8_t portindex, struct dht22_value *rh,
                   struct dht22_value *t);
 
-#endif /* _DHT22_H_ */
+#endif /* _IOE_SENSOR_DHT22_H_ */

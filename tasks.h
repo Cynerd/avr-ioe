@@ -25,6 +25,15 @@ int8_t taskDelayTillT(int8_t *boolean, uin16_t us);
 void taskDelayTillF(int8_t (*fnc)(void));
 void taskDelayTillFT(int8_t (*fnc)(void), uint16_t us);
 
+struct Mutex {
+};
+void takeMutex(void);
+int8_t takeMutexT(uint16_t timeout);
+void giveMutex(void);
+
+struct Semaphore {
+};
+
 #else /* CONFIG_IOE_TASKS */
 
 #define taskDelay(US) _delay_us(US)

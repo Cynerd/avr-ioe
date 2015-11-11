@@ -35,7 +35,7 @@ inline void dht22_init(uint8_t pi) {
 
 
 inline void dht22_read_deac(uint8_t status) {
-            dht22_measurement.status = status;
+    dht22_measurement.status = status;
     // Disable pin change interrupt
     *(PPP.PCMSK) &= ~PPP.PCMSK_MASK;
     timer_disable(CONFIG_IOE_SENSOR_DHT22_TIMER);
@@ -65,8 +65,8 @@ void dht22_read_pcint(void) {
         }
         break;
     default:
-        if (((*(PPP.PIN) & PPP.MASK) && dht22_measurement.port_status == 3) ||
-                !(*(PPP.PIN & PPP.MASK)))
+        if (((*(PPP.PIN) & PPP.MASK) && dht22_measurement.port_status == 3)
+            || !(*(PPP.PIN & PPP.MASK)))
             return;
         dht22_measurement.port_status--;
     }
@@ -89,7 +89,8 @@ int8_t dht22_read(uint8_t pi, struct dht22_value *rh,
     _delay_us(500);
     // Initialize timer
     timer_init(CONFIG_IOE_SENSOR_DHT22_TIMER, TIMER_DIVIDER_64);
-    timer_sethook(CONFIG_IOE_SENSOR_DHT22_TIMER, dht22_read_timer_overflow);
+    timer_sethook(CONFIG_IOE_SENSOR_DHT22_TIMER,
+                  dht22_read_timer_overflow);
     // Set pin change interrupt
     *(PP.PCMSK) |= PP.PCMSK_MASK;
     // Set port as output and pull-up resistor

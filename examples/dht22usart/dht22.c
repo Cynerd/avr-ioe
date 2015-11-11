@@ -3,7 +3,7 @@
 #include <util/delay.h>
 #include <string.h>
 #include "../../usart.h"
-#include "../../sensor_dht22.h"
+//#include "../../sensor_dht22.h"
 
 void rec(uint8_t data) {
     if (data == '\r') {
