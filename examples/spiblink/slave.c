@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include "../../spi.h"
+#include <spi.h>
 
 void receive(uint8_t data);
 

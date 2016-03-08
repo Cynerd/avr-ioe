@@ -1,23 +1,19 @@
-#ifdef CONFIG_IOE_SPI
-#ifdef MCUSUPPORT_USART
+#include <spi.h>
+
+#ifdef CONFIG_SPI
 
 volatile int8_t _spi_busy;
+volatile Mutex spi_mutex;
 
-////// Interrupts ////////////////////////////////
 void (*spi_receive) (uint8_t data) = 0;
 
-#ifdef CONFIG_IOE_CAN_MCP2515
-extern void can_mcp2515_spi_hook(uint8_t);
-#endif /* CONFIG_IOE_CAN_MCP2515 */
-
 ISR(SPI_STC_vect, ISR_BLOCK) {
+    void (*spir_w) (uint8_t data) = spi_receive;
     _spi_busy = 0;
-#ifdef CONFIG_IOE_CAN_MCP2515
-    can_mcp2515_spi_hook(SPDR);
-#endif /* CONFIG_IOE_CAN_MCP2515 */
-    if (spi_receive)
-        spi_receive(SPDR);
+    while (spir_w != NULL) {
+        spir_w(SPDR);
+        spir_w++;
+    }
 }
 
-#endif /* MCUSUPPORT_SPI */
-#endif /* CONFIG_IOE_SPI */
+#endif /* CONFIG_SPI */

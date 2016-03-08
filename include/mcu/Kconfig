@@ -1,0 +1,11 @@
+config MMCU
+    string
+    default "atmega328p" if ATMEGA328P
+    
+choice MCU
+    prompt "Microcontroller (MMCU)"
+
+source include/mcu/atmega328p.Kconfig
+source include/mcu/attiny85.Kconfig
+
+endchoice

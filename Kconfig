@@ -1,0 +1,152 @@
+mainmenu "AVR-IOE configuration"
+
+source "include/mcu/Kconfig"
+
+config F_CPU
+    int "CPU frequency in kHz (F_CPU)"
+    default 16000
+
+# Toolchain #####################################################################
+
+menu "Compilation options"
+
+config GNUTOOLCHAIN_PREFIX
+    string "GNU Toolchain prefix"
+    default "avr-"
+
+config CONFCFLAGS
+    string "Compilation CFlags"
+    default "-Os -ffunction-sections -fdata-sections -fshort-enums -Wall"
+
+endmenu
+
+# IO Ports ######################################################################
+
+config MCUSUPPORT_IOPORTS
+    bool
+    default n
+
+config CONFIG_IOPORTS
+    bool "Input/Output ports"
+    default y
+    depends on MCUSUPPORT_IOPORTS
+
+config MCUSUPPORT_PCINT0
+    bool
+    default n
+config MCUSUPPORT_PCINT1
+    bool
+    default n
+config MCUSUPPORT_PCINT2
+    bool
+    default n
+
+config CONFIG_IOPORTS_PCINT
+    bool "Input/Output ports change interrupts"
+	depends on CONFIG_IOPORTS
+    depends on MCUSUPPORT_PCINT0 || MCUSUPPORT_PCINT1 || MCUSUPPORT_PCINT2
+
+# SPI ###########################################################################
+
+config MCUSUPPORT_SPI
+    bool
+    default n
+
+config CONFIG_SPI
+	bool "Serial peripheral interface"
+    depends on MCUSUPPORT_SPI
+
+# USART #########################################################################
+config MCUSUPPORT_USART
+    bool
+    default n
+
+menuconfig CONFIG_USART
+	bool "Universal synchronous/asynchronous transceiver"
+    depends on MCUSUPPORT_USART
+
+if CONFIG_USART
+
+config CONFIG_USART_BAUD
+	int "Baudrate"
+	default 115200
+
+choice USART_PARITY_C
+	prompt "Parity"
+config USART_PARITY_C_NONE
+	bool "None"
+config USART_PARITY_C_ODD
+	bool "Odd"
+config USART_PARITY_C_EVEN
+	bool "Even"
+endchoice
+config CONFIG_USART_PARITY
+	string
+	default "USART_PARITY_NONE" if USART_PARITY_C_NONE
+	default "USART_PARITY_ODD" if USART_PARITY_C_ODD
+	default "USART_PARITY_EVEN" if USART_PARITY_C_EVEN
+
+config CONFIG_USART_DATABITS
+	int "Data bits"
+	default 8
+
+choice USART_STOPBIT_C
+	prompt "Stop bit"
+config USART_STOPBIT_C_SINGLE
+	bool "Single"
+config USART_STOPBIT_C_DOUBLE
+	bool "Double"
+endchoice
+config CONFIG_USART_STOPBIT
+	string
+	default "USART_STOPBIT_SINGLE" if USART_STOPBIT_C_SINGLE
+	default "USART_STOPBIT_DOUBLE" if USART_STOPBIT_C_DOUBLE
+
+config CONFIG_USART_OUTPUT_BUFFER
+	bool "Use output buffer"
+	default n
+
+config CONFIG_USART_OUTBUFFER_SIZE
+	int "Output buffer size in bytes." if CONFIG_USART_OUTPUT_BUFFER
+	default 0 if CONFIG_USART_OUTPUT_BUFFER
+	default 32
+
+choice USART_OUTBUFFER_MODE_C
+	prompt "Output buffer replacement policy" if CONFIG_USART_OUTPUT_BUFFER
+config USART_OUTBUFFER_MODE_C_BLOCK
+	bool "Block"
+config USART_OUTBUFFER_MODE_C_OVERWRITE
+	bool "Overwrite"
+config USART_OUTBUFFER_MODE_C_DROP
+	bool "Drop"
+endchoice
+config CONFIG_USART_OUTBUFFER_MODE
+	int
+	default 1 if USART_OUTBUFFER_MODE_C_OVERWRITE
+	default 2 if USART_OUTBUFFER_MODE_C_DROP
+	default 0
+
+config CONFIG_USART_INPUT_BUFFER
+	bool "Use input buffer"
+
+config CONFIG_USART_INBUFFER_SIZE
+	int "Input buffer size in bytes." if CONFIG_USART_INPUT_BUFFER
+	default 0 if CONFIG_USART_INPUT_BUFFER
+	default 32
+
+choice USART_INBUFFER_MODE_C
+	prompt "Input buffer replacement policy" if CONFIG_USART_INPUT_BUFFER
+config USART_INBUFFER_MODE_C_BLOCK
+	bool "Block"
+config USART_INBUFFER_MODE_C_OVERWRITE
+	bool "Overwrite"
+config USART_INBUFFER_MODE_C_DROP
+	bool "Drop"
+endchoice
+config CONFIG_USART_INBUFFER_MODE
+	int
+	default 1 if USART_INBUFFER_MODE_C_OVERWRITE
+	default 2 if USART_INBUFFER_MODE_C_DROP
+	default 0
+
+endif

@@ -1,0 +1,20 @@
+site_name: AVR-IOE
+repo_url: https://github.com/Cynerd/avr-ioe.git
+site_description: AVR microcontroller input/output expansion code
+copyright: GNU General Public License, version 2.0
+pages:
+- Home: index.md
+- Usage: usage.md
+- Modules:
+    - IO Ports: modules/ioport.md
+    - SPI: modules/spi.md
+    - Tasks: modules/tasks.md
+    - Timer: modules/timer.md
+    - USART: modules/usart.md
+    - Utils:
+        - Buffer: modules/utils/buffer.md
+        - NArray: modules/utils/narray.md
+- Adding MCU support: add_support.md
+theme: readthedocs
+
+site_dir: html

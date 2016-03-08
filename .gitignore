@@ -1,9 +1,11 @@
 *~
 .*
 !/.gitignore
+!/.gitmodules
 
 *.o
 *.d
 *.hex
 *.elf
 trash
+libioe.a

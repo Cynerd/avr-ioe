@@ -1,5 +1,5 @@
-#include "../usi_spi.h"
-#include "../mcu/mcu_def.h"
+#include <usi_spi.h>
+#include <mcu/mcu_def.h>
 
 inline void usi_spi_init(enum spiMode mode) {
     if (mode == USI_SPI_MODE_MASTER) {

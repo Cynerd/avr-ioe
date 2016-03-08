@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
-#include "../../usart.h"
+#include <usart.h>
 
 void rec(uint8_t data) {
     if (data == '\r') {

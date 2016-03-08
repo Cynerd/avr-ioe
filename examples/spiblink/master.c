@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include "../../spi.h"
+#include <spi.h>
 
 int main() {
     DDRB |= _BV(DDB1) | _BV(DDB2);
