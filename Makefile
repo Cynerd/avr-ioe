@@ -65,6 +65,9 @@ ifeq (,$(findstring help,$(MAKECMDGOALS)))
 ifeq (,$(findstring docs,$(MAKECMDGOALS)))
 ifeq (,$(findstring serve-docs,$(MAKECMDGOALS)))
 ifeq (,$(findstring clean-docs,$(MAKECMDGOALS)))
+ifeq (,$(findstring config,$(MAKECMDGOALS)))
+ifeq (,$(findstring oldconfig,$(MAKECMDGOALS)))
+ifeq (,$(findstring menuconfig,$(MAKECMDGOALS)))
 
 include $(CONFIG)
 -include $(DEP)
@@ -92,6 +95,9 @@ $(DEP): %.d: %.c .config.h
 # This is not optimal because configuration change results to complete project
 # rebuild instead of only rebuilding required files.
 
+endif
+endif
+endif
 endif
 endif
 endif

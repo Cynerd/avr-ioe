@@ -1,11 +1,14 @@
 config MMCU
     string
     default "atmega328p" if ATMEGA328P
+    default "attiny85" if ATTINY85
+    default "attiny4313" if ATTINY4313
     
 choice MCU
     prompt "Microcontroller (MMCU)"
 
 source include/mcu/atmega328p.Kconfig
 source include/mcu/attiny85.Kconfig
+source include/mcu/attiny4313.Kconfig
 
 endchoice
