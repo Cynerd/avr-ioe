@@ -52,6 +52,15 @@ menuconfig:
 	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
 	@[ ! -f config ] || mv config "$(CONFIG).orig"
 	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+
+.PHONY: allyesconfig
+allyesconfig:
+	@[ ! -f "$(CONFIG)" ] || [ ! -f "$(CONFIG).orig" ] || mv "$(CONFIG).orig" config
+	@$(MAKE) -f kconfig/GNUmakefile --no-print-directory \
+		TOPDIR=. SRCDIR=kconfig allyesconfig
+	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
+	@[ ! -f config ] || mv config "$(CONFIG).orig"
+	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
 # Note about this file moving madness:
 # avr-ioe is using Kconfig for configuration and it is not prepared too well for
 # nested projects (at least I don't know way). This unfortunately means that to

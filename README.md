@@ -1,4 +1,5 @@
 #AVR-IOE
+[![Build Status](https://travis-ci.com/Cynerd/avr-ioe.svg?token=j1mJhmD5jiZyJQGyPUkt&branch=master)](https://travis-ci.com/Cynerd/avr-ioe)
 ##AVR input/output expansion
 
 This is library that implements different input/output interfaces and other
