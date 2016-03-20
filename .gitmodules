@@ -1,5 +1,5 @@
 [submodule "kconfig"]
-	path = kconfig
+	path = tools/kconfig
 	url = https://github.com/guillon/kconfig.git
 [submodule "tests/simavr"]
 	path = tests/simavr

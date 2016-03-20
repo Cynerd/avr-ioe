@@ -124,8 +124,8 @@ MAKEOVERRIDES =
 
 callconfig = $(Q)\
 	[ ! -f "$(CONFIG)" ] || mv "$(CONFIG)" config; \
-	IOEROOT=. $(MAKE) -f kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=kconfig $(1); \
+	IOEROOT=. $(MAKE) -f tools/kconfig/GNUmakefile --no-print-directory \
+		TOPDIR=. SRCDIR=tools/kconfig $(1); \
 	[ ! -f config ] || mv config "$(CONFIG)"; \
 	[ ! -f config.old ] || mv config.old "$(CONFIG).old"
 # Note about this file moving madness:
