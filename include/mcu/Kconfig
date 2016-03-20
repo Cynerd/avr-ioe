@@ -7,8 +7,8 @@ config MMCU
 choice MCU
     prompt "Microcontroller (MMCU)"
 
-source include/mcu/atmega328p.Kconfig
-source include/mcu/attiny85.Kconfig
-source include/mcu/attiny4313.Kconfig
+source "$IOEROOT/include/mcu/atmega328p.Kconfig"
+source "$IOEROOT/include/mcu/attiny85.Kconfig"
+source "$IOEROOT/include/mcu/attiny4313.Kconfig"
 
 endchoice

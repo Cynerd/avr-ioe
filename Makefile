@@ -1,18 +1,13 @@
 MAKEFLAGS += --no-builtin-rules
 
-SRC = src/spi.c \
-      src/usart.c \
-      src/timer.c \
-      src/tasks.c \
-      src/ioport.c \
-      src/sensors/dht22.c \
-
-OBJ = $(patsubst %.c,%.o,$(SRC))
-DEP = $(patsubst %.c,%.d,$(SRC))
-
-# default configuration path. Can be changed by enviroment to build with
-# separate configuration files.
-CONFIG ?= .config
+# Default output path. Can be changed by enviroment to compile to different folder
+# than default.
+O ?= .
+# This variable can be overwritten to show executed commands
+Q ?= @
+# This variable can be used if you want to have configuration file for you project
+# in different location than default. You should use absolute path.
+CONFIG ?= $(O)/.config
 
 .PHONY: all
 # Check if we have configuration"
@@ -22,131 +17,97 @@ else
 all: help $(CONFIG)
 endif
 
-$(CONFIG):
-	@echo Please generate configuration first using config or menuconfig target
-	@exit 1
+ifneq ("$(wildcard $(CONFIG))","") # Check if we have configuration
+ifeq (,$(filter clean help docs serve-docs clean-docs config oldconfig \
+	allyesconfig menuconfig, \
+	$(MAKECMDGOALS))) # Ignore build targets if goal is not building
 
-.PHONY: oldconfig
-oldconfig:
-	@[ ! -f "$(CONFIG)" ] || [ ! -f "$(CONFIG).orig" ] || mv "$(CONFIG).orig" config
-	@$(MAKE) -f kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=kconfig oldconfig
-	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
-	@[ ! -f config ] || mv config "$(CONFIG).orig"
-	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+-include $(O)/build/config.mk # include configuration
 
-.PHONY: config
-config:
-	@[ ! -f "$(CONFIG)" ] || [ ! -f "$(CONFIG).orig" ] || mv "$(CONFIG).orig" config
-	@$(MAKE) -f kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=kconfig config
-	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
-	@[ ! -f config ] || mv config "$(CONFIG).orig"
-	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+### Source files list ###########################
+SRC = base.c
+ifeq (y,$(CONFIG_IOPORTS))
+SRC += ioport.c
+endif
+ifeq (y,$(CONFIG_SPI))
+SRC += spi.c
+endif
+ifeq (y,$(CONFIG_USART))
+SRC += usart.c
+endif
+### End of source files list ####################
 
-.PHONY: menuconfig
-menuconfig:
-	@[ ! -f "$(CONFIG)" ] || [ ! -f "$(CONFIG).orig" ] || mv "$(CONFIG).orig" config
-	@$(MAKE) -f kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=kconfig menuconfig
-	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
-	@[ ! -f config ] || mv config "$(CONFIG).orig"
-	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+OBJ = $(patsubst %.c,$(O)/build/%.o,$(SRC))
+DEP = $(patsubst %.c,$(O)/build/%.d,$(SRC))
 
-.PHONY: allyesconfig
-allyesconfig:
-	@[ ! -f "$(CONFIG)" ] || [ ! -f "$(CONFIG).orig" ] || mv "$(CONFIG).orig" config
-	@$(MAKE) -f kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=kconfig allyesconfig
-	@[ ! -f config ] || sed 's/="\(.*\)"/=\1/' config > "$(CONFIG)"
-	@[ ! -f config ] || mv config "$(CONFIG).orig"
-	@[ ! -f config.old ] || mv config.old "$(CONFIG).old"
-# Note about this file moving madness:
-# avr-ioe is using Kconfig for configuration and it is not prepared too well for
-# nested projects (at least I don't know way). This unfortunately means that to
-# have configuration in parent project, We have to move it every time we are
-# generating it. Also upper projects can't use Kconfig for its self configuration.
-
-# Check if we have configuration"
-ifneq ("$(wildcard $(CONFIG))","")
-ifeq (,$(findstring clean,$(MAKECMDGOALS)))
-ifeq (,$(findstring help,$(MAKECMDGOALS)))
-ifeq (,$(findstring docs,$(MAKECMDGOALS)))
-ifeq (,$(findstring serve-docs,$(MAKECMDGOALS)))
-ifeq (,$(findstring clean-docs,$(MAKECMDGOALS)))
-ifeq (,$(findstring config,$(MAKECMDGOALS)))
-ifeq (,$(findstring oldconfig,$(MAKECMDGOALS)))
-ifeq (,$(findstring menuconfig,$(MAKECMDGOALS)))
-
-include $(CONFIG)
 -include $(DEP)
 
 CFLAGS = $(shell echo $(CONFCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L) \
-		 -mmcu=$(MMCU) -Iinclude -imacros .config.h
+		 -mmcu=$(MMCU) -Iinclude -imacros $(O)/build/config.h
 GCC = $(GNUTOOLCHAIN_PREFIX)gcc
 AR = $(GNUTOOLCHAIN_PREFIX)ar
 
-libioe.a: $(OBJ)
+$(O)/libioe.a: $(OBJ)
 	@echo " AR   $@"
-	@$(AR) -crs $@ $^
+	$(Q)$(AR) -crs $@ $^
 
-$(OBJ): %.o: %.c .config.h
+$(OBJ): $(O)/build/%.o: src/%.c
+	$(Q)mkdir -p "$(@D)"
 	@echo " CC   $@"
-	@$(GCC) $(CFLAGS) -c -o $@ $<
+	$(Q)$(GCC) $(CFLAGS) -c -o $@ $<
 
-$(DEP): %.d: %.c .config.h
+$(DEP): $(O)/build/%.d: src/%.c $(O)/build/config.mk
+	$(Q)mkdir -p "$(@D)"
 	@echo " DEP  $@"
-	@$(GCC) -MM -MG -MT '$*.o $@' $(CFLAGS) -c -o $@ $<
+	$(Q)$(GCC) -MM -MG -MT '$*.o $@' $(CFLAGS) -c -o $@ $<
 
-.config.h: $(CONFIG)
-	@echo " GEN  .config.h"
-	@grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed 's/=/ /;s/^/#define /' > $@
+$(O)/build/config.mk: $(CONFIG)
+	$(Q)mkdir -p "$(@D)"
+	@echo " GEN  $(CONFIG).mk"
+	$(Q)sed 's/="\(.*\)"/=\1/' $(CONFIG) > "$@"
+
+$(O)/build/config.h: $(CONFIG)
+	$(Q)mkdir -p "$(@D)"
+	@echo " GEN  $(CONFIG).h"
+	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed 's/=/ /;s/^/#define /' > $@
 # This is not optimal because configuration change results to complete project
 # rebuild instead of only rebuilding required files.
 
-endif
-endif
-endif
-endif
-endif
-endif
-endif
+else
+$(O)/libioe.a:
+	@echo Please execute non-building target separate from building ones
+	@exit 1
 endif
 else
-
-libioe.a:
-	@echo Please generate configuration first using config or menuconfig target
-
+$(O)/libioe.a: $(CONFIG) # Print error message for missing config file
 endif
 
 .PHONY: clean
 clean:
-	@echo " CLEAN OBJ"
-	@$(RM) $(OBJ)
-	@echo " CLEAN DEP"
-	@$(RM) $(DEP) .config.h
+	@echo " CLEAN BUILD"
+	$(Q)$(RM) -r $(O)/build
 	@echo " CLEAN libioe.a"
-	@$(RM) libioe.a
+	$(Q)$(RM) $(O)/libioe.a
 
 .PHONY: docs
 docs:
 	@echo " DOC $@"
-	@mkdocs build
+	$(Q)mkdocs build
 
 
 .PHONY: serve-docs
 serve-docs:
-	@mkdocs serve
+	$(Q)mkdocs serve
 
 .PHONY: clean-docs
 clean-docs:
 	@echo " CLEAN docs"
-	@$(RM) -r site
+	$(Q)$(RM) -r site
 
 .PHONY: distclean
 distclean: clean clean-docs
 	@echo " CLEAN CONFIG"
-	@$(RM) $(CONFIG) $(CONFIG).orig
+	$(Q)$(RM) $(CONFIG) $(CONFIG).orig
 
 .PHONY: help
 help:
@@ -158,3 +119,38 @@ help:
 	@echo  "help         - Prints this text"
 	@echo  "clean        - Removing all object files generated from source files"
 	@echo  "clean-docs   - Remove generated documentation"
+
+$(CONFIG):
+	@echo Please generate configuration first using config or menuconfig target
+	@exit 1
+
+# We don't wont pass any variable to Kconfig. This is workaround for that.
+MAKEOVERRIDES =
+
+callconfig = $(Q)\
+	[ ! -f "$(CONFIG)" ] || mv "$(CONFIG)" config; \
+	IOEROOT=. $(MAKE) -f kconfig/GNUmakefile --no-print-directory \
+		TOPDIR=. SRCDIR=kconfig $(1); \
+	[ ! -f config ] || mv config "$(CONFIG)"; \
+	[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+# Note about this file moving madness:
+# avr-ioe is using Kconfig for configuration and it is not prepared too well for
+# nested projects (at least I don't know way). This unfortunately means that to
+# have configuration in parent project, We have to move it every time we are
+# generating it. Also upper projects can't use Kconfig for its self configuration.
+
+.PHONY: oldconfig
+oldconfig:
+	$(call callconfig, oldconfig)
+
+.PHONY: config
+config:
+	$(call callconfig, config)
+
+.PHONY: menuconfig
+menuconfig:
+	$(call callconfig, menuconfig)
+
+.PHONY: allyesconfig
+allyesconfig:
+	$(call callconfig, allyesconfig)

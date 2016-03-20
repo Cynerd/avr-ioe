@@ -9,9 +9,9 @@
 #define IO_B 0
 #define IO_C 1
 #define IO_D 2
-#define IO_PIN(GROUP)  (* (volatile uint8_t *)(PINB + 0x3*GROUP))
-#define IO_DDR(GROUP)  (* (volatile uint8_t *)(DDRB + 0x3*GROUP))
-#define IO_PORT(GROUP) (* (volatile uint8_t *)(PORTB + 0x3*GROUP))
+#define IO_PIN(GROUP)  _SFR_IO8(0x03 * (1 + GROUP))
+#define IO_DDR(GROUP)  _SFR_IO8(0x04 * (1 + GROUP))
+#define IO_PORT(GROUP) _SFR_IO8(0x05 * (1 + GROUP))
 #define IO_B0 IO_B, (1 << 0)
 #define IO_B1 IO_B, (1 << 1)
 #define IO_B2 IO_B, (1 << 2)

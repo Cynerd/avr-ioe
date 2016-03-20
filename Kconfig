@@ -1,6 +1,9 @@
 mainmenu "AVR-IOE configuration"
 
-source "include/mcu/Kconfig"
+config IOEROOT
+    string
+    option env="IOEROOT"
+source "$IOEROOT/include/mcu/Kconfig"
 
 config F_CPU
     int "CPU frequency in kHz (F_CPU)"

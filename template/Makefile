@@ -7,9 +7,10 @@ PROJNAME = template
 SRC = main.c
 
 OBJ = $(patsubst %.c,%.o,$(SRC)) # This creates list of *.o files from *.c
+Q ?= @ # This can be overwritten to show commands
 
 .PHONY: all
-ifneq ("$(wildcard .config)","") # Checking if configuration exists
+ifneq ("$(wildcard ioeconfig)","") # Checking if configuration exists
 all: $(PROJNAME).hex
 	@echo Now you can flash $< to your chip.
 else
@@ -29,34 +30,36 @@ help:
 .PHONY: clean
 clean:
 	@echo " CLEAN OBJ"
-	@$(RM) $(OBJ)
+	$(Q)$(RM) $(OBJ)
 	@echo " CLEAN $(PROJNAME).elf $(PROJNAME).hex"
-	@$(RM) $(PROJNAME).elf $(PROJNAME).hex
-	@$(MAKE) -C avr-ioe clean
+	$(Q)$(RM) $(PROJNAME).elf $(PROJNAME).hex
+	$(Q)$(MAKE) -C avr-ioe clean CONFIG="$$( readlink -f ioeconfig )"
 
 # Building targets are available only if configuration is generated
-ifneq ("$(wildcard .config)","")
--include .config
+ifneq ("$(wildcard ioeconfig)","")
+include ioeconfig
 # If you want change some standard CFLAGS, change them in configuration not here.
 # Add here only options that should not be applied to avr-ioe also.
-CFLAGS = -Iavr-ioe/include -mmcu=$(MMCU) -imacros avr-ioe/.config.h \
+CFLAGS = -Iavr-ioe/include -mmcu=$(MMCU) -imacros avr-ioe/build/config.h \
 	 $(shell echo $(CONFCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L)
 
 $(PROJNAME).elf: avr-ioe/libioe.a
 $(PROJNAME).elf: $(OBJ)
 	@echo " LD       $@"
-	@avr-gcc -Os -mmcu=$(MMCU) $^ -o $@ -Lavr-ioe -lioe
+	$(Q)avr-gcc -Os -mmcu=$(MMCU) $^ -o $@ -Lavr-ioe -lioe
 
 $(PROJNAME).hex: $(PROJNAME).elf
 	@echo " OBJCOPY  $@"
-	@avr-objcopy -O ihex -R .eeprom $< $@
+	$(Q)avr-objcopy -O ihex -R .eeprom $< $@
 
-$(OBJ): %.o: %.c avr-ioe/libioe.a
+$(OBJ): %.o: %.c avr-ioe/build/config.h
 	@echo " CC       $@"
-	@avr-gcc $(CFLAGS) -c -o $@ $<
+	$(Q)avr-gcc $(CFLAGS) -c -o $@ $<
 
-avr-ioe/libioe.a: .config
-	@CONFIG=$$(readlink -f .config) $(MAKE) -C avr-ioe libioe.a
+avr-ioe/libioe.a: ioeconfig
+	$(Q)$(MAKE) -C avr-ioe libioe.a CONFIG="$$( readlink -f ioeconfig )"
+avr-ioe/build/config.h: ioeconfig
+	$(Q)$(MAKE) -C avr-ioe build/config.h CONFIG="$$( readlink -f ioeconfig )"
 endif
 
 .config:
@@ -65,8 +68,8 @@ endif
 
 .PHONY: config
 config:
-	@CONFIG=$$(readlink -f .config) $(MAKE) -C avr-ioe menuconfig
+	$(Q)$(MAKE) -C avr-ioe menuconfig CONFIG="$$( readlink -f ioeconfig )"
 
 .PHONY: menuconfig
 menuconfig:
-	@CONFIG=$$(readlink -f .config) $(MAKE) -C avr-ioe menuconfig
+	$(Q)$(MAKE) -C avr-ioe menuconfig CONFIG="$$( readlink -f ioeconfig )"
