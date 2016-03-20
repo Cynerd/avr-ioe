@@ -32,10 +32,10 @@ extern volatile int8_t _usart_busy;
  */
 void usart_init_async(void);
 void usart_send(uint8_t data);
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
 void usart_send_str(char *str);
 #endif
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 uint8_t usart_get(void);
 #endif
 static inline uint8_t usart_queryerror(void) {

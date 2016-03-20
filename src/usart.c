@@ -61,7 +61,7 @@ inline void usart_send(uint8_t data) {
     } else {
         IOEBUFFER_PUT(_ioe_usart_outbuffer,
                       CONFIG_USART_OUTBUFFER_SIZE, data,
-                      CONFIGCONFIG_USART_OUTPUT_BUFFER_MODE);
+                      CONFIG_USART_OUTBUFFER_MODE);
     }
 #else
     _usart_busy = 1;
@@ -112,7 +112,7 @@ static int usartput(char c, FILE * f) {
 }
 #endif
 
-#ifdef CONFIGCONFIG_USART_INPUT_BUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 static int usartget(FILE * f) {
     uint8_t v;
     while (!(v = usart_get()));
@@ -143,7 +143,7 @@ SIGNAL(USART_RX_vect) {
 #ifdef CONFIG_USART_INPUT_BUFFER
     uint8_t val = UDR0;
     IOEBUFFER_PUT(_ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE,
-                  val, CONFIGCONFIG_USART_INPUT_BUFFER_MODE);
+                  val, CONFIG_USART_INBUFFER_MODE);
 #endif /* CONFIG_USART_INPUT_BUFFER */
     if (usart_receive)
         usart_receive(UDR0);
