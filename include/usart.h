@@ -17,12 +17,10 @@
 #define USART_DATAOVERRUN _BV(DOR0)
 #define USART_PARITYERROR _BV(UPE0)
 
-#if CONFIG_USART_INBUFFER_SIZE > 0
-#define _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 volatile IOEBUFFER(uint8_t, _ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE);
 #endif
-#if CONFIG_USART_OUTBUFFER_SIZE > 0
-#define _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
 volatile IOEBUFFER(uint8_t, _ioe_usart_outbuffer, CONFIG_USART_OUTBUFFER_SIZE);
 #endif
 
@@ -46,10 +44,10 @@ static inline uint8_t usart_queryerror(void) {
 static inline int8_t usart_busy(void) {
     return _usart_busy;
 }
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 uint8_t usart_inbuffered(void);
 #endif
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
 uint8_t usart_outbuffered(void);
 #endif
 #if (defined CONFIG_USART_INFILE) || (defined CONFIG_USART_OUTFILE)

@@ -1,10 +1,13 @@
 AVR Input/Output expansion
 ==========================
 
-Modules
--------
-| Module                        | Header   | Enable Config                             | Description                                            |
-|-------------------------------|----------|-------------------------------------------|--------------------------------------------------------|
-| [IO Ports](modules/ioport.md) | ioport.h | CONFIG_IOPORTS and CONFIG_IOE_PCINTERRUPT | Simple input/output port access                        |
-| [SPI](modules/spi.md)         | spi.h    | CONFIG_SPI                                | Serial peripheral interface                            |
-| [USART](modules/usart.md)     | usart.h  | CONFIG_USART                              | Universal synchronous/asynchronous receive/transmitter |
+Parts
+-----
+Whole library consists from set of parts. You can use any part directly or
+only trough other part. Every part can be enabled or disabled.
+
+| Parts                         | Header   | Description                                            |
+|-------------------------------|----------|--------------------------------------------------------|
+| [IO Ports](parts/ioport.md) | ioport.h | Simple input/output port access                        |
+| [SPI](parts/spi.md)         | spi.h    | Serial peripheral interface                            |
+| [USART](parts/usart.md)     | usart.h  | Universal synchronous/asynchronous receive/transmitter |

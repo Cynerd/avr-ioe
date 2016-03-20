@@ -1,9 +1,16 @@
 Serial peripheral interface
 ===========================
-This interface is link to MOSI and MISO pins. Also SS pin is used when slave mode initialized.
+To use include: `spi.h`  
+This interface is link to MOSI and MISO pins. Also SS pin is used when slave mode
+initialized.
 
-## References
-### spi\_init
+Configuration
+-------------
+To use SPI you must enable `CONFIG_SPI` configuration symbol.
+
+References
+----------
+### Function spi\_init
 ```C
 static inline void spi_init(enum spiMode mode)
 ```
@@ -13,20 +20,20 @@ Parameters:
   
 NOTE: Global interrupts must be enabled for right function of SPI.
 
-### spi\_busy
+### Function spi\_busy
 ```C
 static inline int8_t spi_busy(void)
 ```
 Returns NULL when device is not busy.  
 When device is busy return values in non-zero.
 
-### spi\_join    
+### Function spi\_join    
 ```C
 static inline void spi_join(void)
 ```
 Blocks processor until device is not busy.
 
-### spi\_send
+### Function spi\_send
 ```C
 static inline uint8_t spi_send(uint8_t data)
 ```
@@ -34,7 +41,7 @@ Swap bytes with slave over SPI.
 This function blocks execution until device isn't busy (transfer completed).  
 WARNING: Invoke this only when interface is initialized in MASTER mode.
 
-### spi\_transfer
+### Function spi\_transfer
 ```C
 static inline void spi_transfer(uint8_t data)
 ```
@@ -43,7 +50,7 @@ This function isn't blocking execution until transfer is complete.
 Always call spi\_join before this function when called outside of spi\_receive().  
 WARNING: Invoke this only when interface is initialized in MASTER mode.
 
-### spi\_expose
+### Function spi\_expose
 ```C
 static inline void spi_expose(uint8_t data)
 ```
@@ -52,14 +59,14 @@ Please don't use this when device is busy.
 Best place to call this is spi\_receive().  
 WARNING: Invoke this only when interface is initialized in SLAVE mode.
 
-## Function pointer spi\_receive
+### Function pointer spi\_receive
 ```C
 extern void (*spi_receive)(uint8_t data)
 ```
 This function is called every time transfer is finished.
 And until return from this function interrupts are disabled.
 
-## Enum spiMode
+### Enum spiMode
 ```C
 enum spiMode {
     SPI_MODE_MASTER,
@@ -67,3 +74,7 @@ enum spiMode {
 };
 ```
 This is used as parameter for spi\_init function.
+
+Relevant examples
+-----------------
+* spiblink

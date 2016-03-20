@@ -1,6 +1,7 @@
 Tasks
 =====
-Tasks allows separate jobs.
+Tasks can be used for sharing processor for example during period of waiting for
+interrupt. Planing is based on priority.
 
 ## Functions
 ### tasks_run

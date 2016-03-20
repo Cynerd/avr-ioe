@@ -30,7 +30,7 @@ clean:
 	$(Q)$(RM) $(OBJ)
 	@echo " CLEAN $(PROJNAME).elf $(PROJNAME).hex"
 	$(Q)$(RM) $(PROJNAME).elf $(PROJNAME).hex
-	$(Q)$(MAKE) -C ../.. clean O=examples/blink
+	$(Q)$(MAKE) -C ../.. clean O=examples/$(PROJNAME)
 
 # Building targets are available only if configuration is generated
 ifneq ("$(wildcard .config)","")
@@ -54,7 +54,7 @@ $(OBJ): %.o: %.c libioe.a
 	$(Q)avr-gcc $(CFLAGS) -c -o $@ $<
 
 libioe.a: .config
-	$(Q)$(MAKE) -C ../.. examples/blink/libioe.a O=examples/blink
+	$(Q)$(MAKE) -C ../.. examples/$(PROJNAME)/libioe.a O=examples/$(PROJNAME)
 endif
 
 .config:
@@ -62,8 +62,8 @@ endif
 	@exit 1
 
 config:
-	$(Q)$(MAKE) -C ../.. config O=examples/blink
+	$(Q)$(MAKE) -C ../.. config O=examples/$(PROJNAME)
 
 .PHONY: menuconfig
 menuconfig:
-	$(Q)$(MAKE) -C ../.. menuconfig O=examples/blink
+	$(Q)$(MAKE) -C ../.. menuconfig O=examples/$(PROJNAME)

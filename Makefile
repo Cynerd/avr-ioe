@@ -22,7 +22,7 @@ ifeq (,$(filter clean help docs serve-docs clean-docs config oldconfig \
 	allyesconfig menuconfig, \
 	$(MAKECMDGOALS))) # Ignore build targets if goal is not building
 
--include $(O)/build/config.mk # include configuration
+include $(CONFIG) # include configuration
 
 ### Source files list ###########################
 SRC = base.c
@@ -56,20 +56,15 @@ $(OBJ): $(O)/build/%.o: src/%.c
 	@echo " CC   $@"
 	$(Q)$(GCC) $(CFLAGS) -c -o $@ $<
 
-$(DEP): $(O)/build/%.d: src/%.c $(O)/build/config.mk
+$(DEP): $(O)/build/%.d: src/%.c
 	$(Q)mkdir -p "$(@D)"
 	@echo " DEP  $@"
 	$(Q)$(GCC) -MM -MG -MT '$*.o $@' $(CFLAGS) -c -o $@ $<
 
-$(O)/build/config.mk: $(CONFIG)
-	$(Q)mkdir -p "$(@D)"
-	@echo " GEN  $(CONFIG).mk"
-	$(Q)sed 's/="\(.*\)"/=\1/' $(CONFIG) > "$@"
-
 $(O)/build/config.h: $(CONFIG)
 	$(Q)mkdir -p "$(@D)"
-	@echo " GEN  $(CONFIG).h"
-	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed 's/=/ /;s/^/#define /' > $@
+	@echo " GEN  $@"
+	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed 's/="\(.*\)"/=\1/;s/=/ /;s/^/#define /' > $@
 # This is not optimal because configuration change results to complete project
 # rebuild instead of only rebuilding required files.
 

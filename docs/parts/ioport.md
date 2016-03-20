@@ -1,6 +1,5 @@
 IO port
 =======
-To use include: `ioport.md`  
 And define: `CONFIG_IOE_IOPORT`
 
 Defines simple access to io ports. This allows runtime access to any pin with just
@@ -16,36 +15,45 @@ command.
 WARNING: No check is implemented for right group number. Usage of unsupported
 value is undefined (write to other parts of memory can happen).
 
-## References
+Configuration
+-------------
+To use this part, you must enable `CONFIG_IOPORTS` option.  
+This part also handles pin change interrupts. Enable it using
+`CONFIG_IOPORTS_PCINT` option.
+
+References
+----------
 ### For output
 #### Function io_setout
 ```C
 static inline void io_setout(uint8_t group, uint8_t mask)
 ```
 Configures port of `group` with `mask` as output.  
-Parameters:
-    group - Character specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+Parameters:  
+__group__ - Character specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 #### Function io_hight
 ```C
 static inline void io_hight(uint8_t group, uint8_t mask)
 ```
 Sets output port to hight (also can be called as 1).  
-WARNING: Invoke this only if io_setout is called before.  
-Parameters:
-    group - Character specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+WARNING: Invoke this only if io_setout is called before.
+
+Parameters:  
+__group__ - Character specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 #### Function io_low
 ```C
 static inline void io_low(uint8_t group, uint8_t mask)
 ```
 Sets output port to low (also called as 0).  
-WARNING: Invoke this only if io_setout is called before.  
-Parameters:
-    group - Number specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+WARNING: Invoke this only if io_setout is called before.
+
+Parameters:  
+__group__ - Number specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 #### Function io_set
 ```C
@@ -53,9 +61,9 @@ static inline void io_set(uint8_t group, uint8_t mask, int8_t val)
 ```
 Sets output port to value passed as argument.  
 WARNING: Invoke this only if io_setout is called before.  
-Parameters:
-    group - Number specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+Parameters:  
+__group__ - Number specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 ### For input
 #### Function io_setin
@@ -64,20 +72,22 @@ static inline void io_setin(uint8_t group, uint8_t mask,
                                 enum ioeIOInResistor resistor)
 ```
 Configures port of `group` with `mask` as input with specified pull-up/down
-resistor.  
-Parameters:
-    group - Number specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+resistor.
+
+Parameters:  
+__group__ - Number specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 #### Function io_get
 ```C
 static inline int8_t io_get(uint8_t group, uint8_t mask)
 ```
 Returns current value of port. Note that you can use this also if port is
-configured as output.  
-Parameters:
-    group - Number specifying exact port group
-    mask  - Binary shifted 1. Shift is equal to port index in specified group.
+configured as output.
+
+Parameters:  
+__group__ - Number specifying exact port group  
+__mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
 #### Enum ioeIOInResistor
 ```C
@@ -100,20 +110,22 @@ specifies port and edge specifies on what edge should hook be called. `edge` can
 be IO_RISING or IO_FALLING or their binary combination with operator
 `|`.  
 WARNING: `change` call is call during interrupt handling. You shouldn't be
-blocking execution for long time.  
+blocking execution for long time.
+
 Parameters:  
-    group  - Number specifying exact port group
-    mask   - Binary shifted 1. Shift is equal to port index in specified group.
-    edge   - Signals on what edge should be hook called.
-    change - Pointer to function used as interupt hook
+__group__  - Number specifying exact port group.  
+__mask__   - Binary shifted 1. Shift is equal to port index in specified group.  
+__edge__   - Signals on what edge should be hook called.  
+__change__ - Pointer to function used as interupt hook.  
 
 #### Function io_change_remhook
 ```C
 int8_t io_change_remhook(void (*change) (uint8_t group, uint8_t mask))
 ```
-Removes `change` hook.  
+Removes `change` hook.
+
 Parameters:  
-    change - Pointer to function used as hook
+__change__ - Pointer to function used as hook
 
 ### Others
 #### Definitions IO_{GROUP}
@@ -126,12 +138,14 @@ mcu support file should define all ports in form of single line definition in
 format `IOE_IO_{GROUP}{INDEX}`. Disadvantage is that with these definitions you
 can't use binary conjunction and so only one pin can be controlled with it.
 
-## Relevant examples
+Relevant examples
+-----------------
 * blink
 * pcinterrupt
 
-## Adding support
-For more information on how add support, see `doc/add_support.md`.
+Adding support
+--------------
+For more information on how add support, see [Adding MCU support](/add_support.md).
 Main definition is `MCUSUPPORT_IOPORT`. Define it to enable support.
 
 ### IO_{GROUP}

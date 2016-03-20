@@ -8,50 +8,6 @@
 #define USART_STOPBIT_SINGLE 1
 #define USART_STOPBIT_DOUBLE 2
 
-#ifndef CONFIG_USART_BAUD
-#warning "CONFIG_USART_BAUD not defined. Setting default 9600."
-#define CONFIG_USART_BAUD 9600
-#endif
-#ifndef CONFIG_USART_PARITY
-#warning "CONFIG_USART_PARITY not defined. Using default USART_PARITY_NONE."
-#define CONFIG_USART_PARITY USART_PARITY_NONE
-#endif
-#ifndef CONFIG_USART_STOPBIT
-#warning "CONFIG_USART_STOPBIT not defined. Using default USART_STOPBIT_SINGLE."
-#define CONFIG_USART_STOPBIT USART_STOPBIT_SINGLE
-#endif
-#ifndef CONFIG_USART_DATABITS
-#warning "CONFIG_USART_DATABITS not defined. Using default 8."
-#define CONFIG_USART_DATABITS 8
-#endif
-
-#if !((CONFIG_USART_PARITY == USART_PARITY_NONE) || \
-      (CONFIG_USART_PARITY == USART_PARITY_ODD) || \
-      (CONFIG_USART_PARITY == USART_PARITY_EVEN))
-#error "CONFIG_USART_PARITY has value, that is not allowed."
-#endif
-
-#if !((CONFIG_USART_STOPBIT == USART_STOPBIT_SINGLE) || \
-      (CONFIG_USART_STOPBIT == USART_STOPBIT_DOUBLE))
-#error "CONFIG_USART_STOPBIT has value, that is not allowed."
-#endif
-
-#if !((CONFIG_USART_DATABITS == 5) || \
-      (CONFIG_USART_DATABITS == 6) || \
-      (CONFIG_USART_DATABITS == 7) || \
-      (CONFIG_USART_DATABITS == 8))
-// TODO DATABITS 9 is not supported
-#error "CONFIG_USART_DATABITS has value, that is not allowed."
-#endif
-
-#if (defined CONFIG_USART_INFILE) && (CONFIG_USART_INBUFFER_SIZE <= 0)
-#error "USART Input file can't be enabled without input buffer"
-#endif
-#if (defined CONFIG_USART_OUTFILE) && (CONFIG_USART_OUTBUFFER_SIZE <= 0)
-#error "USART Input file can't be enabled without output buffer"
-#endif
-
-
 volatile int8_t _usart_busy;
 
 void usart_init_async(void) {
@@ -89,40 +45,40 @@ void usart_init_async(void) {
     // Enable receiver, transmitter and RX complete,
     // Data register empty interrupts
     UCSR0B = _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0) | _BV(UDRIE0);
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
     IOEBUFFER_INIT(_ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE);
 #endif
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
     IOEBUFFER_INIT(_ioe_usart_outbuffer, CONFIG_USART_OUTBUFFER_SIZE);
 #endif
 }
 
 inline void usart_send(uint8_t data) {
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
     if (!_usart_busy) {
         _usart_busy = 1;
         UDR0 = data;
     } else {
         IOEBUFFER_PUT(_ioe_usart_outbuffer,
                       CONFIG_USART_OUTBUFFER_SIZE, data,
-                      CONFIG_USART_OUTBUFFER_MODE);
+                      CONFIGCONFIG_USART_OUTPUT_BUFFER_MODE);
     }
 #else
     _usart_busy = 1;
     UDR0 = data;
-#endif /* _USART_OUTBUFFER */
+#endif /* CONFIG_USART_OUTPUT_BUFFER */
 }
 
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
 inline void usart_send_str(char *str) {
     while (*str != '\0') {
         usart_send((uint8_t) * str);
         str++;
     }
 }
-#endif /* _USART_OUTBUFFER */
+#endif /* CONFIG_USART_OUTPUT_BUFFER */
 
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 uint8_t usart_get(void) {
     uint8_t rtn;
     IOEBUFFER_GET(_ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE,
@@ -131,7 +87,7 @@ uint8_t usart_get(void) {
 }
 #endif
 
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
 uint8_t usart_inbuffered(void) {
     uint8_t rtn;
     IOEBUFFER_CNT(_ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE,
@@ -140,7 +96,7 @@ uint8_t usart_inbuffered(void) {
 }
 #endif
 
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
 uint8_t usart_outbuffered(void) {
     uint8_t rtn;
     IOEBUFFER_CNT(_ioe_usart_outbuffer, CONFIG_USART_OUTBUFFER_SIZE,
@@ -156,7 +112,7 @@ static int usartput(char c, FILE * f) {
 }
 #endif
 
-#ifdef CONFIG_USART_INBUFFER
+#ifdef CONFIGCONFIG_USART_INPUT_BUFFER
 static int usartget(FILE * f) {
     uint8_t v;
     while (!(v = usart_get()));
@@ -184,17 +140,17 @@ void (*usart_receive) (uint8_t data) = 0;
 void (*usart_sent) (void) = 0;
 
 SIGNAL(USART_RX_vect) {
-#ifdef _USART_INBUFFER
+#ifdef CONFIG_USART_INPUT_BUFFER
     uint8_t val = UDR0;
     IOEBUFFER_PUT(_ioe_usart_inbuffer, CONFIG_USART_INBUFFER_SIZE,
-                  val, CONFIG_USART_INBUFFER_MODE);
-#endif /* _USART_INBUFFER */
+                  val, CONFIGCONFIG_USART_INPUT_BUFFER_MODE);
+#endif /* CONFIG_USART_INPUT_BUFFER */
     if (usart_receive)
         usart_receive(UDR0);
 }
 
 SIGNAL(USART_UDRE_vect) {
-#ifdef _USART_OUTBUFFER
+#ifdef CONFIG_USART_OUTPUT_BUFFER
     uint8_t val;
     IOEBUFFER_GET(_ioe_usart_outbuffer, CONFIG_USART_OUTBUFFER_SIZE,
                   val);
@@ -204,7 +160,7 @@ SIGNAL(USART_UDRE_vect) {
         _usart_busy = 0;
 #else
     _usart_busy = 0;
-#endif /* _USART_OUTBUFFER */
+#endif /* CONFIG_USART_OUTPUT_BUFFER */
     if (usart_sent)
         usart_sent();
 }
