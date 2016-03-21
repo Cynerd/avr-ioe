@@ -46,6 +46,7 @@ CFLAGS = $(shell echo $(CONFCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L) \
 		 -mmcu=$(MMCU) -Iinclude -imacros $(O)/build/config.h
 GCC = $(GNUTOOLCHAIN_PREFIX)gcc
 AR = $(GNUTOOLCHAIN_PREFIX)ar
+CPP = $(GNUTOOLCHAIN_PREFIX)cpp
 
 $(O)/libioe.a: $(OBJ)
 	@echo " AR   $@"
@@ -56,17 +57,15 @@ $(OBJ): $(O)/build/%.o: src/%.c
 	@echo " CC   $@"
 	$(Q)$(GCC) $(CFLAGS) -c -o $@ $<
 
-$(DEP): $(O)/build/%.d: src/%.c
+$(DEP): $(O)/build/%.d: src/%.c $(O)/build/config.h
 	$(Q)mkdir -p "$(@D)"
 	@echo " DEP  $@"
-	$(Q)$(GCC) -MM -MG -MT '$*.o $@' $(CFLAGS) -c -o $@ $<
+	$(Q)$(CPP) -MM -MG -MT '$(O)/build/$*.o $@' $(CFLAGS) -o $@ $<
 
 $(O)/build/config.h: $(CONFIG)
 	$(Q)mkdir -p "$(@D)"
 	@echo " GEN  $@"
-	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed 's/="\(.*\)"/=\1/;s/=/ /;s/^/#define /' > $@
-# This is not optimal because configuration change results to complete project
-# rebuild instead of only rebuilding required files.
+	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed -e 's/="\(.*\)"/=\1/;s/=/ /;s/^/#define /' > $@
 
 else
 $(O)/libioe.a:
