@@ -5,19 +5,19 @@ copyright: GNU General Public License, version 2.0
 pages:
 - Home: index.md
 - Usage: usage.md
-- Parts:
-    - IO Ports: parts/ioport.md
-    - SPI: parts/spi.md
-    - Tasks: parts/tasks.md
-    - Jobs: parts/jobs.md
-    - Timer: parts/timer.md
-    - USART: parts/usart.md
+- References:
+    - IO Ports: references/ioport.md
+    - SPI: references/spi.md
+    - Tasks: references/tasks.md
+    - Jobs: references/jobs.md
+    - Timer: references/timer.md
+    - USART: references/usart.md
     - Utils:
-        - Buffer: parts/utils/buffer.md
-        - NArray: parts/utils/narray.md
+        - Buffer: references/utils/buffer.md
+        - NArray: references/utils/narray.md
 - Adding MCU support: add_support.md
 - Miscellanoues:
-    - Jobs vs. Tasks: miscellanoues/jobs_vs_tasks.md
+    - Jobs vs. Tasks: miscelaneous/jobs_vs_tasks.md
 theme: readthedocs
 
 site_dir: html

@@ -1,3 +1,4 @@
+// vim:ts=4:sw=4:sts=4:expandtab
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>

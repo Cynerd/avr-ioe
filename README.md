@@ -1,6 +1,6 @@
-#AVR-IOE
+#  AVR-IOE
 [![Build Status](https://travis-ci.com/Cynerd/avr-ioe.svg?token=j1mJhmD5jiZyJQGyPUkt&branch=master)](https://travis-ci.com/Cynerd/avr-ioe)
-##AVR input/output expansion
+## AVR input/output expansion
 
 This is library that implements different input/output interfaces and other
 utilities. Its target is to create simple and highly configurable pack of code for

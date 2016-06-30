@@ -1,3 +1,4 @@
+# vim:ts=4:sw=4:sts=4:noexpandtab
 MAKEFLAGS += --no-builtin-rules
 
 # Default output path. Can be changed by enviroment to compile to different folder
@@ -53,17 +54,17 @@ $(O)/libioe.a: $(OBJ)
 	$(Q)$(AR) -crs $@ $^
 
 $(OBJ): $(O)/build/%.o: src/%.c
-	$(Q)mkdir -p "$(@D)"
+	@mkdir -p "$(@D)"
 	@echo " CC   $@"
 	$(Q)$(GCC) $(CFLAGS) -c -o $@ $<
 
 $(DEP): $(O)/build/%.d: src/%.c $(O)/build/config.h
-	$(Q)mkdir -p "$(@D)"
+	@mkdir -p "$(@D)"
 	@echo " DEP  $@"
 	$(Q)$(CPP) -MM -MG -MT '$(O)/build/$*.o $@' $(CFLAGS) -o $@ $<
 
 $(O)/build/config.h: $(CONFIG)
-	$(Q)mkdir -p "$(@D)"
+	@mkdir -p "$(@D)"
 	@echo " GEN  $@"
 	$(Q)grep -v "^#" $(CONFIG) | grep "CONFIG_" | sed -e 's/="\(.*\)"/=\1/;s/=/ /;s/^/#define /' > $@
 

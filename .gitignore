@@ -8,5 +8,9 @@
 *.d
 *.hex
 *.elf
+*.old
+html
+build
 trash
 libioe.a
+install.sh

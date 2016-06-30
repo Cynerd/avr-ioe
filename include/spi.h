@@ -1,3 +1,4 @@
+// vim:ts=4:sw=4:sts=4:expandtab
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
@@ -9,11 +10,6 @@
 #define _IOE_SPI_H_
 #ifdef CONFIG_SPI
 
-/*! \brief Modes definition for spi_init
- *
- * This enum is used by spi_init to define if SPI should be initialized as master
- * or slave.
- */
 enum spiMode {
     SPI_MODE_MASTER,
     SPI_MODE_SLAVE
@@ -22,10 +18,6 @@ enum spiMode {
 volatile extern int8_t _spi_busy;
 volatile extern Mutex spi_mutex;
 
-/*! \brief Initializes SPI interface.  
- *
- * \param mode Specify mode of SPI interface
- */
 static inline void spi_init(enum spiMode mode) {
     _spi_busy = 0;
     if (mode == SPI_MODE_MASTER) {

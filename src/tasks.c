@@ -33,15 +33,6 @@ void task_stack_reg(TaskStack * ts, Task * t) {
 void task_stack_unreg(TaskStack * ts, Task * t) {
 }
 
-void init_mutex(Mutex * mtx, uint8_t flags) {
-};
-void take_mutex(Mutex * mtx) {
-};
-int8_t take_mutex_t(Mutex * mtx, uint16_t timeout) {
-};
-void give_mutex(Mutex * mtx) {
-};
-
 #else /* CONFIG_IOE_TASKS */
 
 int8_t task_delay_till(volatile int8_t * boolean, uint16_t timeout) {

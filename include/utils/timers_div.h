@@ -1,11 +1,6 @@
-//#include "../timer.h"
-enum timerDivider {
-    TIMER_DIVIDER_1,
-    TIMER_DIVIDER_8,
-    TIMER_DIVIDER_64,
-    TIMER_DIVIDER_256,
-    TIMER_DIVIDER_1024
-};
+#ifndef _IOE_TIMER_H_
+#error Please include time.h before timers_div.h
+#endif
 
 #ifndef TIMER_DIV_RESTIME
 #error Please define minimal time (us) before include timers_div.h in TIMER_DIV_RESTIME
