@@ -1,8 +1,0 @@
-script:
-      - "make allyesconfig && make"
-
-addons:
-  apt:
-    packages:
-            - gcc-avr
-            - avr-libc
