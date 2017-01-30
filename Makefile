@@ -134,18 +134,20 @@ callconfig = $(Q)\
 # have configuration in parent project, We have to move it every time we are
 # generating it. Also upper projects can't use Kconfig for its self configuration.
 
+-include .config.cmd
+
 .PHONY: oldconfig
-oldconfig:
+oldconfig: $(deps_config)
 	$(call callconfig, oldconfig)
 
 .PHONY: config
-config:
+config: $(deps_config)
 	$(call callconfig, config)
 
 .PHONY: menuconfig
-menuconfig:
+menuconfig: $(deps_config)
 	$(call callconfig, menuconfig)
 
 .PHONY: allyesconfig
-allyesconfig:
+allyesconfig: $(deps_config)
 	$(call callconfig, allyesconfig)
