@@ -1,125 +1,117 @@
 mainmenu "AVR-IOE configuration"
 
 config IOEROOT
-    string
-    option env="IOEROOT"
+	string
+	option env="IOEROOT"
 source "$IOEROOT/include/mcu/Kconfig"
 
 config F_CPU
-    int "CPU frequency in kHz (F_CPU)"
-    default 16000
+	int "CPU frequency in kHz (F_CPU)"
+	default 16000
 
 # Toolchain #####################################################################
 
 menu "Compilation options"
 
 config GNUTOOLCHAIN_PREFIX
-    string "GNU Toolchain prefix"
-    default "avr-"
+	string "GNU Toolchain prefix"
+	default "avr-"
 
 config CONFCFLAGS
-    string "Compilation CFlags"
-    default "-Os -ffunction-sections -fdata-sections -fshort-enums -Wall"
+	string "Compilation CFlags"
+	default "-Os -ffunction-sections -fdata-sections -fshort-enums -Wall"
 
 endmenu
 
-# Tracing and error handling ####################################################
-
-menu "Tracing and error handling"
+# Error handling ################################################################
 
 config CONFIG_ERRORS
-    bool "Errors support"
+	bool "Errors support"
+	default y
 
 if CONFIG_ERRORS
 
 menu "Errors handling"
 
 config CONFIG_EH_RESTART
-    bool "Restart MCU on error detection"
+	bool "Restart MCU on error detection"
+	default y
 
 config CONFIG_EH_MEMORY
-    bool "TODO: Write error code and possible stack trase to EEPROM"
+	bool "(TODO) Write error code and possible stack trase to EEPROM"
+	default n
 
 config CONFIG_EH_LED
-    bool "Signal error detection by LED"
-    depends on CONFIG_IOPORTS
+	bool "Signal error detection by LED"
+	depends on CONFIG_IOPORTS
+	default n
 
 config CONFIG_EH_LED_IOPIN
-    string "Error detection led output pin"
-    depends on CONFIG_EH_LED
-    default "IO_B0"
-    ---help---
-    Specifies IO pin which will be pulled up on error detection.
-    This string should be valid IO port (for example "IO_B0") or pair of group
-    mask divided by comma (for example "IO_B, _BV(0)").
+	string "Error detection led output pin"
+	depends on CONFIG_EH_LED
+	default "IO_B0"
+	---help---
+	Specifies IO pin which will be pulled up on error detection.
+	This string should be valid IO port (for example "IO_B0") or pair of group
+	mask divided by comma (for example "IO_B, _BV(0)").
 
 config CONFIG_EH_USART
-    bool "Send error informations by UART"
-    depends on CONFIG_USART && CONFIG_USART_OUTPUT_BUFFER
+	bool "Send error informations by UART"
+	depends on CONFIG_USART && CONFIG_USART_OUTPUT_BUFFER
+	default n
 
 endmenu
 
 config CONFIG_CHECK_ARGUMENTS
-    bool "Check arguments for all functions in library"
+	bool "Check arguments for all functions in library"
+	default n
 
 endif
-
-config CONFIG_TRACING
-    bool "TODO: Tracing support"
-
-if CONFIG_TRACING
-
-config CONFIG_TRACE_FUNCTIONCALL
-    bool "TODO: Trace all function calls in library"
-
-endif
-
-endmenu
 
 # IO Ports ######################################################################
 
 config MCUSUPPORT_IOPORTS
-    bool
-    default n
+	bool
+	default n
 
 config CONFIG_IOPORTS
-    bool "Input/Output ports"
-    default y
-    depends on MCUSUPPORT_IOPORTS
+	bool "Input/Output ports"
+	default y
+	depends on MCUSUPPORT_IOPORTS
 
 config MCUSUPPORT_PCINT0
-    bool
-    default n
+	bool
+	default n
 config MCUSUPPORT_PCINT1
-    bool
-    default n
+	bool
+	default n
 config MCUSUPPORT_PCINT2
-    bool
-    default n
+	bool
+	default n
 
 config CONFIG_IOPORTS_PCINT
-    bool "Input/Output ports change interrupts"
+	bool "Input/Output ports change interrupts"
 	depends on CONFIG_IOPORTS
-    depends on MCUSUPPORT_PCINT0 || MCUSUPPORT_PCINT1 || MCUSUPPORT_PCINT2
+	depends on MCUSUPPORT_PCINT0 || MCUSUPPORT_PCINT1 || MCUSUPPORT_PCINT2
 
 # SPI ###########################################################################
 
 config MCUSUPPORT_SPI
-    bool
-    default n
+	bool
+	default n
 
 config CONFIG_SPI
-	bool "Serial peripheral interface"
-    depends on MCUSUPPORT_SPI
+	bool "SPI (Serial peripheral interface)"
+	depends on MCUSUPPORT_SPI
 
 # USART #########################################################################
 config MCUSUPPORT_USART
-    bool
-    default n
+	bool
+	default n
 
 menuconfig CONFIG_USART
-	bool "Universal synchronous/asynchronous transceiver"
-    depends on MCUSUPPORT_USART
+	bool "USART (Universal synchronous/asynchronous transceiver)"
+	depends on MCUSUPPORT_USART
 
 if CONFIG_USART
 
@@ -145,7 +137,7 @@ config CONFIG_USART_PARITY
 config CONFIG_USART_DATABITS
 	int "Data bits"
 	default 8
-    range 5 8
+	range 5 8
 
 choice USART_STOPBIT_C
 	prompt "Stop bit"
@@ -166,7 +158,7 @@ config CONFIG_USART_OUTPUT_BUFFER
 config CONFIG_USART_OUTBUFFER_SIZE
 	int "Output buffer size in bytes." if CONFIG_USART_OUTPUT_BUFFER
 	default 0 if ! CONFIG_USART_OUTPUT_BUFFER
-    range 1 512000 if CONFIG_USART_OUTPUT_BUFFER
+	range 1 512000 if CONFIG_USART_OUTPUT_BUFFER
 	default 32
 
 choice USART_OUTBUFFER_MODE_C
@@ -190,7 +182,7 @@ config CONFIG_USART_INPUT_BUFFER
 config CONFIG_USART_INBUFFER_SIZE
 	int "Input buffer size in bytes." if CONFIG_USART_INPUT_BUFFER
 	default 0 if ! CONFIG_USART_INPUT_BUFFER
-    range 1 512000 if CONFIG_USART_INPUT_BUFFER
+	range 1 512000 if CONFIG_USART_INPUT_BUFFER
 	default 32
 
 choice USART_INBUFFER_MODE_C
@@ -209,70 +201,16 @@ config CONFIG_USART_INBUFFER_MODE
 	default 0
 
 config CONFIG_USART_OUTFILE
-    bool "STD FILE support for output"
-    depends on CONFIG_USART_OUTPUT_BUFFER
+	bool "STD FILE support for output"
+	depends on CONFIG_USART_OUTPUT_BUFFER
 
 config CONFIG_USART_INFILE
-    bool "STD FILE support for input"
-    depends on CONFIG_USART_INPUT_BUFFER
+	bool "STD FILE support for input"
+	depends on CONFIG_USART_INPUT_BUFFER
 
 endif
 
 # Timers ########################################################################
 
 config CONFIG_TIMERS
-    bool "Timers"
-
-# Tasks #########################################################################
-
-menuconfig CONFIG_TASKS
-    bool "Taks support"
-    depends on CONFIG_TIMERS
-
-if CONFIG_TASKS
-
-config CONFIG_TASKS_TIME
-    bool "Measure approximate real time"
-
-choice TASKS_TIMER
-    prompt "Timer used for tasks planning and interrupts"
-    default TASKS_TIMER_2
-
-config TASKS_TIMER_0
-    bool "Timer0 (8-bit)"
-
-config TASKS_TIMER_1
-    bool "Timer1 (16-bit)"
-
-config TASKS_TIMER_2
-    bool "Timer2 (8-bit asynchronous)"
-
-endchoice
-
-endif
-
-# Jobs ##########################################################################
-
-menuconfig CONFIG_JOBS
-    bool "Jobs support"
-    ---help---
-    Job support allows you to plan and execute functions periodically. This is
-    designed for realtime control.
-
-if CONFIG_JOBS
-
-choice JOBS_DURATION
-    prompt "Jobs duration source"
-
-config JOBS_DURATION_CONSTANT
-    bool "Predefined constants"
-
-config JOBS_DURATION_PREV
-    bool "Previous execution time"
-
-config JOBS_DURATION_MAX
-    bool "Maximum previous time"
-
-endchoice
-
-endif 
+	bool "Timers"
