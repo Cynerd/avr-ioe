@@ -1,4 +1,3 @@
-// vim:ts=4:sw=4:sts=4:expandtab
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
@@ -11,11 +10,11 @@
 #ifdef CONFIG_IOE_TIMERS
 
 enum timerDivider {
-    TIMER_DIVIDER_1,
-    TIMER_DIVIDER_8,
-    TIMER_DIVIDER_64,
-    TIMER_DIVIDER_256,
-    TIMER_DIVIDER_1024
+	TIMER_DIVIDER_1,
+	TIMER_DIVIDER_8,
+	TIMER_DIVIDER_64,
+	TIMER_DIVIDER_256,
+	TIMER_DIVIDER_1024
 };
 
 void timer_init(uint8_t timer, enum timerDivider div);

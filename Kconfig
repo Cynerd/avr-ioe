@@ -8,18 +8,50 @@ source "$IOEROOT/include/mcu/Kconfig"
 config F_CPU
 	int "CPU frequency in kHz (F_CPU)"
 	default 16000
+	---help---
+	Frequency CPU is running on. This must be value in kHz.
 
 # Toolchain #####################################################################
 
 menu "Compilation options"
 
-config GNUTOOLCHAIN_PREFIX
-	string "GNU Toolchain prefix"
+config CHOST
+	string "AVR Compilation toolchain prefix (host)"
 	default "avr-"
+	---help---
+	Prefix used for all calls to compilation toolchain when compiling for AVR.
 
-config CONFCFLAGS
-	string "Compilation CFlags"
+config CCFLAGS
+	string "AVR compilation flags"
 	default "-Os -ffunction-sections -fdata-sections -fshort-enums -Wall"
+	---help---
+	C compilation flags for AVR host. Its suggested to not remove defaults unless
+	you know what they do.
+
+config CLDFLAGS
+	string "AVR linking flags"
+	default ""
+	---help---
+	C linking flags for AVR host.
+
+config CBUILD
+	string "Building machine compilation toolchain prefix (build)"
+	default ""
+	---help---
+	Prefix used for all calls to compilation toolchain when compiling applications
+	used for compilation or testing.
+
+config BUILD_CFLAGS
+	string "Bulding machine compilation flags"
+	default "-Wall"
+	---help---
+	C compilation flags for build.
+
+config BUILD_LDFLAGS
+	string "Building machine linking flags"
+	default ""
+	---help---
+	C linking flags for build.
 
 endmenu
 
@@ -28,6 +60,10 @@ endmenu
 config CONFIG_ERRORS
 	bool "Errors support"
 	default y
+	---help---
+	This enables error handling. This enables some checks and allows both avr-ioe
+	and you program to react on errors. This doesn't handless hardware errors,
+	only software ones.
 
 if CONFIG_ERRORS
 
@@ -35,16 +71,25 @@ menu "Errors handling"
 
 config CONFIG_EH_RESTART
 	bool "Restart MCU on error detection"
-	default y
-
-config CONFIG_EH_MEMORY
-	bool "(TODO) Write error code and possible stack trase to EEPROM"
 	default n
+	---help---
+	CPU is restarted when error is detected. This is suggested in production.
+
+config CONFIG_EH_HANG
+	bool "Hang execution until manual restart on error detection"
+	default n
+	---help---
+	Program hangs execution when error is detected. This is suggested in
+	development.
 
 config CONFIG_EH_LED
 	bool "Signal error detection by LED"
 	depends on CONFIG_IOPORTS
 	default n
+	---help---
+	When error is detected, specified output is pulled up. This is handy with
+	CONFIG_EH_HANG. If you use this with CONFIG_EH_RESTART you will probably
+	miss led blink.
 
 config CONFIG_EH_LED_IOPIN
 	string "Error detection led output pin"
@@ -55,16 +100,29 @@ config CONFIG_EH_LED_IOPIN
 	This string should be valid IO port (for example "IO_B0") or pair of group
 	mask divided by comma (for example "IO_B, _BV(0)").
 
-config CONFIG_EH_USART
-	bool "Send error informations by UART"
-	depends on CONFIG_USART && CONFIG_USART_OUTPUT_BUFFER
-	default n
-
 endmenu
+
+config CONFIG_ERROR_MESSAGES
+	bool "Build with error messages"
+	default n
+	---help---
+	If errors should support messages. Compiling error messages to code can be
+	handy to finding out errors, but also makes program unnecessary big.
+
+config CONFIG_ERROR_CALLBACK
+	bool "User program implements callback to be used to optionally resolve error"
+	default n
+	---help---
+	This allows user program to define error callback to be called just after
+	error is detected. This also can suppress error, but that is dangerous and
+	should be used only with deep understanding of what it means.
 
 config CONFIG_CHECK_ARGUMENTS
 	bool "Check arguments for all functions in library"
 	default n
+	---help---
+	If arguments passed to functions in library should be checked and
+	possibly error should be risen.
 
 endif
 
@@ -169,6 +227,9 @@ config USART_OUTBUFFER_MODE_C_OVERWRITE
 	bool "Overwrite"
 config USART_OUTBUFFER_MODE_C_DROP
 	bool "Drop"
+config USART_OUTBUFFER_MODE_C_ERROR
+	depends  on CONFIG_ERRORS
+	bool "Error"
 endchoice
 config CONFIG_USART_OUTBUFFER_MODE
 	int
@@ -193,6 +254,9 @@ config USART_INBUFFER_MODE_C_OVERWRITE
 	bool "Overwrite"
 config USART_INBUFFER_MODE_C_DROP
 	bool "Drop"
+config USART_INBUFFER_MODE_C_ERROR
+	depends  on CONFIG_ERRORS
+	bool "Error"
 endchoice
 config CONFIG_USART_INBUFFER_MODE
 	int

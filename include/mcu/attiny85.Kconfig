@@ -1,4 +1,4 @@
 config ATTINY85
-    bool "attiny85"
+    bool "ATtiny85"
     select MCUSUPPORT_IOPORTS
     select MCUSUPPORT_PCINT0

@@ -1,5 +1,5 @@
 config ATTINY4313
-    bool "attiny4313"
+    bool "ATtiny4313"
     select MCUSUPPORT_IOPORTS
     select MCUSUPPORT_PCINT0
     select MCUSUPPORT_PCINT1

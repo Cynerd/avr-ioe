@@ -43,11 +43,11 @@ DEP = $(patsubst %.c,$(O)/build/%.d,$(SRC))
 
 -include $(DEP)
 
-CFLAGS = $(shell echo $(CONFCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L) \
+CFLAGS = $(shell echo $(CCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L) \
 		 -mmcu=$(MMCU) -Iinclude -imacros $(O)/build/config.h
-GCC = $(GNUTOOLCHAIN_PREFIX)gcc
-AR = $(GNUTOOLCHAIN_PREFIX)ar
-CPP = $(GNUTOOLCHAIN_PREFIX)cpp
+CC = $(CHOST)gcc
+AR = $(CHOST)ar
+CPP = $(CHOST)cpp
 
 $(O)/libioe.a: $(OBJ)
 	@echo " AR   $@"
@@ -56,7 +56,7 @@ $(O)/libioe.a: $(OBJ)
 $(OBJ): $(O)/build/%.o: src/%.c
 	@mkdir -p "$(@D)"
 	@echo " CC   $@"
-	$(Q)$(GCC) $(CFLAGS) -c -o $@ $<
+	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
 $(DEP): $(O)/build/%.d: src/%.c $(O)/build/config.h
 	@mkdir -p "$(@D)"
@@ -97,10 +97,10 @@ serve-docs:
 .PHONY: clean-docs
 clean-docs:
 	@echo " CLEAN docs"
-	$(Q)$(RM) -r site
+	$(Q)$(RM) -r html
 
-.PHONY: distclean
-distclean: clean clean-docs
+.PHONY: proper
+proper: clean clean-docs
 	@echo " CLEAN CONFIG"
 	$(Q)$(RM) $(CONFIG) $(CONFIG).orig
 

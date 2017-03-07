@@ -1,11 +1,12 @@
 config MMCU
-    string
-    default "atmega328p" if ATMEGA328P
-    default "attiny85" if ATTINY85
-    default "attiny4313" if ATTINY4313
+	string
+	default "atmega328p" if ATMEGA328P
+	default "atmega168a" if ATMEGA168A
+	default "attiny85" if ATTINY85
+	default "attiny4313" if ATTINY4313
     
 choice MCU
-    prompt "Microcontroller (MMCU)"
+	prompt "Microcontroller (MMCU)"
 
 source "$IOEROOT/include/mcu/atmega328p.Kconfig"
 source "$IOEROOT/include/mcu/attiny85.Kconfig"

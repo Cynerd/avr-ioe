@@ -41,25 +41,29 @@ include ioeconfig
 # If you want change some standard CFLAGS, change them in configuration not here.
 # Add here only options that should not be applied to avr-ioe also.
 CFLAGS = -Iavr-ioe/include -mmcu=$(MMCU) -imacros avr-ioe/build/config.h \
-	 $(shell echo $(CONFCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L)
+	 $(shell echo $(CCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L)
+CC = $(CHOST)gcc
+AR = $(CHOST)ar
+CPP = $(CHOST)cpp
+OBJCOPY = $(CHOST)objcopy
 
 $(PROJNAME).elf: avr-ioe/libioe.a
 $(PROJNAME).elf: $(OBJ)
 	@echo " LD       $@"
-	$(Q)avr-gcc -Os -mmcu=$(MMCU) $^ -o $@ -Lavr-ioe -lioe
+	$(Q)$(CC) -Os -mmcu=$(MMCU) $^ -o $@ -Lavr-ioe -lioe
 
 $(PROJNAME).hex: $(PROJNAME).elf
 	@echo " OBJCOPY  $@"
-	$(Q)avr-objcopy -O ihex -R .eeprom $< $@
+	$(Q)$(OBJCOPY) -O ihex -R .eeprom $< $@
 
 $(OBJ): %.o: %.c avr-ioe/build/config.h
 	@echo " CC       $@"
-	$(Q)avr-gcc $(CFLAGS) -c -o $@ $<
+	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
 avr-ioe/libioe.a: ioeconfig
-	$(Q)$(MAKE) -C avr-ioe libioe.a CONFIG="$$( readlink -f ioeconfig )"
+	$(Q)+$(MAKE) -C avr-ioe libioe.a CONFIG="$$( readlink -f ioeconfig )"
 avr-ioe/build/config.h: ioeconfig
-	$(Q)$(MAKE) -C avr-ioe build/config.h CONFIG="$$( readlink -f ioeconfig )"
+	$(Q)+$(MAKE) -C avr-ioe build/config.h CONFIG="$$( readlink -f ioeconfig )"
 endif
 
 .config:

@@ -2,6 +2,3 @@
 	path = tools/kconfig
 	url = https://github.com/guillon/kconfig.git
 	ignore = dirty
-[submodule "tests/simavr"]
-	path = tests/simavr
-	url = https://github.com/buserror/simavr.git

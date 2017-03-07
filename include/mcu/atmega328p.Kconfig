@@ -1,5 +1,14 @@
 config ATMEGA328P
-    bool "atmega328p"
+    bool "ATmega328P"
+    select MCUSUPPORT_IOPORTS
+    select MCUSUPPORT_PCINT0
+    select MCUSUPPORT_PCINT1
+    select MCUSUPPORT_PCINT2
+    select MCUSUPPORT_SPI
+    select MCUSUPPORT_USART
+
+config ATMEGA168A
+    bool "ATmega168A"
     select MCUSUPPORT_IOPORTS
     select MCUSUPPORT_PCINT0
     select MCUSUPPORT_PCINT1
