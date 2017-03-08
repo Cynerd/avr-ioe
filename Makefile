@@ -24,19 +24,7 @@ ifeq (,$(filter clean help docs serve-docs clean-docs config oldconfig \
 	$(MAKECMDGOALS))) # Ignore build targets if goal is not building
 
 include $(CONFIG) # include configuration
-
-### Source files list ###########################
-SRC = base.c
-ifeq (y,$(CONFIG_IOPORTS))
-SRC += ioport.c
-endif
-ifeq (y,$(CONFIG_SPI))
-SRC += spi.c
-endif
-ifeq (y,$(CONFIG_USART))
-SRC += usart.c
-endif
-### End of source files list ####################
+include src/sources.mk
 
 OBJ = $(patsubst %.c,$(O)/build/%.o,$(SRC))
 DEP = $(patsubst %.c,$(O)/build/%.d,$(SRC))
@@ -102,52 +90,20 @@ clean-docs:
 .PHONY: proper
 proper: clean clean-docs
 	@echo " CLEAN CONFIG"
-	$(Q)$(RM) $(CONFIG) $(CONFIG).orig
+	$(Q)$(RM) $(CONFIG) $(CONFIG).orig .config.cmd
 
 .PHONY: help
 help:
 	@echo  "all/libioe.a - Build library"
 	@echo  "config       - Start configuration program"
-	@echo  "menuconfig   - NCurses based configuration program"
+	@echo  "menuconfig   - NCurses based configuration program (Kconfig)"
 	@echo  "docs         - Build documentation"
 	@echo  "server-docs  - Start temporally http server with documentation"
 	@echo  "help         - Prints this text"
 	@echo  "clean        - Removing all object files generated from source files"
 	@echo  "clean-docs   - Remove generated documentation"
+	@echo  "proper       - Cleans everything including configuration"
 
-$(CONFIG):
-	@echo Please generate configuration first using config or menuconfig target
-	@exit 1
-
-# We don't wont pass any variable to Kconfig. This is workaround for that.
-MAKEOVERRIDES =
-
-callconfig = $(Q)\
-	[ ! -f "$(CONFIG)" ] || mv "$(CONFIG)" config; \
-	IOEROOT=. $(MAKE) -f tools/kconfig/GNUmakefile --no-print-directory \
-		TOPDIR=. SRCDIR=tools/kconfig $(1); \
-	[ ! -f config ] || mv config "$(CONFIG)"; \
-	[ ! -f config.old ] || mv config.old "$(CONFIG).old"
-# Note about this file moving madness:
-# avr-ioe is using Kconfig for configuration and it is not prepared too well for
-# nested projects (at least I don't know way). This unfortunately means that to
-# have configuration in parent project, We have to move it every time we are
-# generating it. Also upper projects can't use Kconfig for its self configuration.
-
--include .config.cmd
-
-.PHONY: oldconfig
-oldconfig: $(deps_config)
-	$(call callconfig, oldconfig)
-
-.PHONY: config
-config: $(deps_config)
-	$(call callconfig, config)
-
-.PHONY: menuconfig
-menuconfig: $(deps_config)
-	$(call callconfig, menuconfig)
-
-.PHONY: allyesconfig
-allyesconfig: $(deps_config)
-	$(call callconfig, allyesconfig)
+TOOL_PATH=tools
+IOEROOT=.
+include tools/kconfig.mk

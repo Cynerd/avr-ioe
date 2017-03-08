@@ -1,0 +1,9 @@
+mainmenu "AVR-IOE blink configuration"
+
+# We need CONFIG_IOPORTS, but we don't care about anything else.
+config BLINK_DEFAULTS
+	bool
+	default y
+	select CONFIG_IOPORTS
+
+source "../../ioe.Kconfig"

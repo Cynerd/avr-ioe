@@ -24,7 +24,7 @@ void _error(enum ErrorCodes ec) {
 #ifdef CONFIG_EH_LED
 	// Set led
 	io_setout(CONFIG_EH_LED_IOPIN);
-	io_hight(CONFIG_EH_LED_IOPIN);
+	io_high(CONFIG_EH_LED_IOPIN);
 #endif /* CONFIG_EH_LED */
 
 #ifdef CONFIG_EH_HANGS

@@ -1,0 +1,11 @@
+mainmenu "AVR-IOE usartecho configuration"
+
+# We need CONFIG_IOPORTS, but we don't care about anything else.
+config USART_ECHO_DEFAULTS
+	bool
+	default y
+	select CONFIG_USART
+	select CONFIG_USART_OUTPUT_BUFFER
+	depends on ! CONFIG_USART_INPUT_BUFFER
+
+source "../../ioe.Kconfig"

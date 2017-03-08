@@ -1,5 +1,5 @@
 MAKEFLAGS += --no-builtin-rules
-# Change PROJNAME value to you project name
+# Change PROJNAME value to your project name
 # Care to not make any space at the end!
 PROJNAME = template
 

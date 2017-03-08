@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #include "mcu/mcu_def.h"
-#include "tasks.h"
 #include "utils/buffer.h"
 
 #ifndef _USART_H_
@@ -39,10 +38,10 @@ void usart_send_str(char *str);
 uint8_t usart_get(void);
 #endif
 static inline uint8_t usart_queryerror(void) {
-    return UCSR0A & (_BV(FE0) | _BV(DOR0) | _BV(UPE0));
+	return UCSR0A & (_BV(FE0) | _BV(DOR0) | _BV(UPE0));
 }
 static inline int8_t usart_busy(void) {
-    return _usart_busy;
+	return _usart_busy;
 }
 #ifdef CONFIG_USART_INPUT_BUFFER
 uint8_t usart_inbuffered(void);

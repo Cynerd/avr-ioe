@@ -6,7 +6,7 @@ int main() {
 	io_setout(IO_B0);
 
 	while (1) {
-		io_hight(IO_B0);
+		io_high(IO_B0);
 		_delay_ms(500);
 		io_low(IO_B0);
 		_delay_ms(500);

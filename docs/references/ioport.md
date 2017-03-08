@@ -33,9 +33,9 @@ Parameters:
 __group__ - Character specifying exact port group  
 __mask__  - Binary shifted 1. Shift is equal to port index in specified group.  
 
-#### Function io_hight
+#### Function io_high
 ```C
-static inline void io_hight(uint8_t group, uint8_t mask)
+static inline void io_high(uint8_t group, uint8_t mask)
 ```
 Sets output port to hight (also can be called as 1).  
 WARNING: Invoke this only if io_setout is called before.
