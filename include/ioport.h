@@ -30,7 +30,7 @@ static inline void io_set(uint8_t group, uint8_t mask, int8_t val) {
 }
 
 static inline void io_setin(uint8_t group, uint8_t mask,
-                            enum ioInResistor resistor) {
+							enum ioInResistor resistor) {
 	IO_DDR(group) &= ~mask;
 	if (resistor == IO_PULLUP)
 		IO_PORT(group) |= mask;

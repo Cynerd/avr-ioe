@@ -1,14 +1,15 @@
-mainmenu "AVR-IOE blink configuration"
+mainmenu "AVR-IOE spiblink slave configuration"
 
 # We need CONFIG_IOPORTS, but we don't care about anything else.
-config BLINK_DEFAULTS
+config SPIBLINK_SLAVE_DEFAULTS
 	bool
 	default y
+	select CONFIG_SPI
 	select CONFIG_IOPORTS
 
 config CONFIG_BLINK_IO
 	string "Output pin used to connect led"
-	depends on BLINK_DEFAULTS
+	depends on SPIBLINK_SLAVE_DEFAULTS
 	default "IO_B0"
 
-source "../../ioe.Kconfig"
+source "../../../ioe.Kconfig"

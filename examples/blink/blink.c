@@ -3,12 +3,12 @@
 #include <ioport.h>
 
 int main() {
-	io_setout(IO_B0);
+	io_setout(CONFIG_BLINK_IO);
 
 	while (1) {
-		io_high(IO_B0);
+		io_high(CONFIG_BLINK_IO);
 		_delay_ms(500);
-		io_low(IO_B0);
+		io_low(CONFIG_BLINK_IO);
 		_delay_ms(500);
 	}
 }

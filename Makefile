@@ -94,6 +94,7 @@ proper: clean clean-docs
 
 .PHONY: help
 help:
+	@echo  "AVR input/output expansion library"
 	@echo  "all/libioe.a - Build library"
 	@echo  "config       - Start configuration program"
 	@echo  "menuconfig   - NCurses based configuration program (Kconfig)"

@@ -1,0 +1,20 @@
+mainmenu "AVR-IOE spiblink master configuration"
+
+# We need CONFIG_IOPORTS, but we don't care about anything else.
+config SPIBLINK_MASTER_DEFAULTS
+	bool
+	default y
+	select CONFIG_SPI
+	select CONFIG_IOPORTS
+
+config CONFIG_BUTTON_IO
+	string "Input pin used to connect button"
+	depends on SPIBLINK_MASTER_DEFAULTS
+	default "IO_C1"
+
+config CONFIG_LED_IO
+	string "Output pin used to connect test led"
+	depends on SPIBLINK_MASTER_DEFAULTS
+	default "IO_B0"
+
+source "../../../ioe.Kconfig"

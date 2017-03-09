@@ -3,13 +3,16 @@ MAKEFLAGS += --no-builtin-rules
 # Note this file is included to Makefiles in lower directories so all paths here
 # are like thy would be from lower directory.
 
-# You have to define EXAMPLE_NAME variable
+ifndef IOEROOT
+$(error Before including examples.mk define IOEROOT)
+endif
 ifndef EXAMPLE_NAME
 $(error Before including examples.mk define EXAMPLE_NAME)
 endif
 ifndef SRC
 $(error Before including examples.mk define SRC)
 endif
+EXAMPLE_PATH ?= $(EXAMPLE_NAME)
 
 OBJ = $(patsubst %.c,%.o,$(SRC)) # This creates list of *.o files from *.c
 Q ?= @ # This can be overwritten to show commands
@@ -40,14 +43,14 @@ clean:
 	$(Q)$(RM) $(OBJ)
 	@echo " CLEAN $(EXAMPLE_NAME).elf $(EXAMPLE_NAME).hex"
 	$(Q)$(RM) $(EXAMPLE_NAME).elf $(EXAMPLE_NAME).hex
-	$(Q)$(MAKE) -C ../.. clean O=examples/$(EXAMPLE_NAME)
+	$(Q)$(MAKE) -C "$(IOEROOT)" clean O=examples/$(EXAMPLE_PATH)
 
 # Building targets are available only if configuration is generated
 ifneq ("$(wildcard $(CONFIG))","")
 -include $(CONFIG)
 # If you want change some standard CFLAGS, change them in configuration not here.
 # Add here only options that should not be applied to avr-ioe also.
-CFLAGS = -I../../include -mmcu=$(MMCU) -imacros build/config.h \
+CFLAGS = -I"$(IOEROOT)/include" -mmcu=$(MMCU) -imacros build/config.h \
 	 $(shell echo $(CCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L)
 CC = $(CHOST)gcc
 OBJCOPY = $(CHOST)objcopy
@@ -66,9 +69,8 @@ $(OBJ): %.o: %.c libioe.a
 	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
 libioe.a: $(CONFIG)
-	$(Q)$(MAKE) -C ../.. examples/$(EXAMPLE_NAME)/libioe.a O=examples/$(EXAMPLE_NAME)
+	$(Q)$(MAKE) -C "$(IOEROOT)" examples/$(EXAMPLE_PATH)/libioe.a O=examples/$(EXAMPLE_PATH)
 endif
 
-TOOL_PATH=../../tools
-IOEROOT=../../
-include ../../tools/kconfig.mk
+TOOL_PATH="$(IOEROOT)/tools"
+include $(IOEROOT)/tools/kconfig.mk
