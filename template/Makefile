@@ -9,12 +9,15 @@ SRC = main.c
 OBJ = $(patsubst %.c,%.o,$(SRC)) # This creates list of *.o files from *.c
 Q ?= @ # This can be overwritten to show commands
 
+IOEROOT = avr-ioe
+CONFIG = ioeconfig
+
 .PHONY: all
-ifneq ("$(wildcard ioeconfig)","") # Checking if configuration exists
+ifneq ("$(wildcard $(CONFIG))","") # Checking if configuration exists
 all: $(PROJNAME).hex
 	@echo Now you can flash $< to your chip.
 else
-all: help .config
+all: $(CONFIG)
 endif
 
 # Edit here help like you ever want
@@ -33,47 +36,38 @@ clean:
 	$(Q)$(RM) $(OBJ)
 	@echo " CLEAN $(PROJNAME).elf $(PROJNAME).hex"
 	$(Q)$(RM) $(PROJNAME).elf $(PROJNAME).hex
-	$(Q)$(MAKE) -C avr-ioe clean CONFIG="$$( readlink -f ioeconfig )"
+	$(Q)+$(MAKE) -C "$(IOEROOT)" clean CONFIG="$$( readlink -f $(CONFIG) )"
 
 # Building targets are available only if configuration is generated
-ifneq ("$(wildcard ioeconfig)","")
-include ioeconfig
+ifneq ("$(wildcard $(CONFIG))","")
+include $(CONFIG)
 # If you want change some standard CFLAGS, change them in configuration not here.
 # Add here only options that should not be applied to avr-ioe also.
-CFLAGS = -Iavr-ioe/include -mmcu=$(MMCU) -imacros avr-ioe/build/config.h \
+CFLAGS = -I"$(IOEROOT)/include" -mmcu=$(MMCU) -imacros "$(IOEROOT)/build/config.h" \
 	 $(shell echo $(CCFLAGS)) $(shell echo -DF_CPU=$(F_CPU)000L)
 CC = $(CHOST)gcc
 AR = $(CHOST)ar
 CPP = $(CHOST)cpp
 OBJCOPY = $(CHOST)objcopy
 
-$(PROJNAME).elf: avr-ioe/libioe.a
+$(PROJNAME).elf: $(IOEROOT)/libioe.a
 $(PROJNAME).elf: $(OBJ)
 	@echo " LD       $@"
-	$(Q)$(CC) -Os -mmcu=$(MMCU) $^ -o $@ -Lavr-ioe -lioe
+	$(Q)$(CC) -Os -mmcu=$(MMCU) $^ -o $@ -L"$(IOEROOT)" -lioe
 
 $(PROJNAME).hex: $(PROJNAME).elf
 	@echo " OBJCOPY  $@"
 	$(Q)$(OBJCOPY) -O ihex -R .eeprom $< $@
 
-$(OBJ): %.o: %.c avr-ioe/build/config.h
+$(OBJ): %.o: %.c $(IOEROOT)/build/config.h
 	@echo " CC       $@"
 	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
-avr-ioe/libioe.a: ioeconfig
-	$(Q)+$(MAKE) -C avr-ioe libioe.a CONFIG="$$( readlink -f ioeconfig )"
-avr-ioe/build/config.h: ioeconfig
-	$(Q)+$(MAKE) -C avr-ioe build/config.h CONFIG="$$( readlink -f ioeconfig )"
+$(IOEROOT)/libioe.a: $(CONFIG)
+	$(Q)+$(MAKE) -C $(IOEROOT) libioe.a CONFIG="$$( readlink -f $(CONFIG) )"
+$(IOEROOT)/build/config.h: $(CONFIG)
+	$(Q)+$(MAKE) -C $(IOEROOT) build/config.h CONFIG="$$( readlink -f $(CONFIG) )"
 endif
 
-.config:
-	@echo Please generate configuration first using config or menuconfig target
-	@exit 1
-
-.PHONY: config
-config:
-	$(Q)$(MAKE) -C avr-ioe menuconfig CONFIG="$$( readlink -f ioeconfig )"
-
-.PHONY: menuconfig
-menuconfig:
-	$(Q)$(MAKE) -C avr-ioe menuconfig CONFIG="$$( readlink -f ioeconfig )"
+TOOL_PATH="$(IOEROOT)/tools"
+include $(IOEROOT)/tools/kconfig.mk

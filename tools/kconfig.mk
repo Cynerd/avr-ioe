@@ -15,12 +15,12 @@ $(CONFIG):
 # So include of this file should be last line in Makefile
 MAKEOVERRIDES =
 
-callconfig = $(Q)\
-	[ ! -f "$(CONFIG)" ] || mv "$(CONFIG)" config; \
-	IOEROOT="$(IOEROOT)" $(MAKE) -f "$(TOOL_PATH)/kconfig/GNUmakefile" --no-print-directory \
-		TOPDIR=. SRCDIR="$(TOOL_PATH)/kconfig" $(1); \
-	[ ! -f config ] || mv config "$(CONFIG)"; \
-	[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+define callconfig
+$(Q)[ ! -f "$(CONFIG)" ] || mv "$(CONFIG)" config
+$(Q)+$(MAKE) -f "$(TOOL_PATH)/kconfig/GNUmakefile" --no-print-directory IOEROOT="$(IOEROOT)" TOPDIR=. SRCDIR="$(TOOL_PATH)/kconfig" $(1)
+$(Q)[ ! -f config ] || mv config "$(CONFIG)"
+$(Q)[ ! -f config.old ] || mv config.old "$(CONFIG).old"
+endef
 # Note about this file moving madness:
 # avr-ioe is using Kconfig for configuration and it is not prepared too well for
 # nested projects (at least I don't know way). This unfortunately means that to

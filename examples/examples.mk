@@ -43,7 +43,7 @@ clean:
 	$(Q)$(RM) $(OBJ)
 	@echo " CLEAN $(EXAMPLE_NAME).elf $(EXAMPLE_NAME).hex"
 	$(Q)$(RM) $(EXAMPLE_NAME).elf $(EXAMPLE_NAME).hex
-	$(Q)$(MAKE) -C "$(IOEROOT)" clean O=examples/$(EXAMPLE_PATH)
+	$(Q)+$(MAKE) -C "$(IOEROOT)" clean O=examples/$(EXAMPLE_PATH)
 
 # Building targets are available only if configuration is generated
 ifneq ("$(wildcard $(CONFIG))","")
@@ -69,7 +69,7 @@ $(OBJ): %.o: %.c libioe.a
 	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
 
 libioe.a: $(CONFIG)
-	$(Q)$(MAKE) -C "$(IOEROOT)" examples/$(EXAMPLE_PATH)/libioe.a O=examples/$(EXAMPLE_PATH)
+	$(Q)+$(MAKE) -C "$(IOEROOT)" examples/$(EXAMPLE_PATH)/libioe.a O=examples/$(EXAMPLE_PATH)
 endif
 
 TOOL_PATH="$(IOEROOT)/tools"

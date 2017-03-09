@@ -1,0 +1,3 @@
+mainmenu "AVR-IOE template"
+
+source "avr-ioe/ioe.Kconfig"
